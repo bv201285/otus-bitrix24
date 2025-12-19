@@ -16,7 +16,7 @@
 /automation/
 /bi/
 /biconnector/
-/bitrix/
+/bitrix/*
 !/bitrix/.settings.php
 !/bitrix/.settings_extra.php
 /bizproc/
