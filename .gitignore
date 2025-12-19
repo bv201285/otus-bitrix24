@@ -1,3 +1,4 @@
+
 /.idea/
 /.access.php
 /.bottom.menu.php
@@ -76,5 +77,4 @@
 /ustat.php
 /workgroups/
 /vendor
-/local/logs/
 
