@@ -11,6 +11,7 @@
 /agent_contract/
 /ai/
 /apconnect/
+/app/
 /auth.php
 /auth/
 /automation/
@@ -33,6 +34,7 @@
 /desktop_menu/
 /devops/
 /docs/
+/einvoice/
 /extranet/
 /favicon.ico
 /hr/
