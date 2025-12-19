@@ -12,12 +12,14 @@
 /agent_contract/
 /ai/
 /apconnect/
+/app/
 /auth.php
 /auth/
 /automation/
 /bi/
 /biconnector/
-/bitrix/
+/bitrix/*
+!/bitrix/.settings_extra.php
 /bizproc/
 /blank.php
 /booking/
@@ -33,6 +35,7 @@
 /desktop_menu/
 /devops/
 /docs/
+/einvoice/
 /extranet/
 /favicon.ico
 /hr/
