@@ -17,6 +17,8 @@
 /bi/
 /biconnector/
 /bitrix/
+!/bitrix/.settings.php
+!/bitrix/.settings_extra.php
 /bizproc/
 /blank.php
 /booking/
