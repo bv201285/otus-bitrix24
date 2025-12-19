@@ -14,7 +14,7 @@ class Log
     {
         $logFile = $_SERVER['DOCUMENT_ROOT'] . '/local/logs/' . $fileName . '.log';
 
-
+        $message = iconv('utf-8', 'windows-1251', $message);
 
         $_message = date("d-m-Y H:i:s");
         $_message .= "\n";
