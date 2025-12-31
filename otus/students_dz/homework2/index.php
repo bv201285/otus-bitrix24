@@ -1,14 +1,17 @@
-<? use Bitrix\Main\Page\Asset;
-
-require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php"); ?>
 <?php
-$APPLICATION->SetTitle("ДЗ #2: Отладка и логирование");
 
-Asset::getInstance()->addCss('//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css');
+    global $APPLICATION;
+    use Bitrix\Main\Page\Asset;
+
+    require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php");
+
+    $APPLICATION->SetTitle("ДЗ #2: Отладка и логирование");
+
+    Asset::getInstance()->addCss('//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css');
 
 
 ?>
-<h1 class="mb-3"><? $APPLICATION->ShowTitle() ?></h1>
+<h1 class="mb-3"><?php $APPLICATION->ShowTitle() ?></h1>
 
 <h4 class="mb-3">Часть 1 - Logger</h4>
 <ul class="list-group">
@@ -44,4 +47,4 @@ Asset::getInstance()->addCss('//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bo
 </ul>
 
 
-<? require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/footer.php"); ?>
+<?php require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/footer.php"); ?>
