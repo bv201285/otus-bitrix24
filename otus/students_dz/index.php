@@ -39,17 +39,20 @@ Asset::getInstance()->addCss('//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bo
     <section class="container-fluid">
 
         <h1 class="mb-3"><? $APPLICATION->ShowTitle() ?></h1>
-        <div class="mb-3">Репозиторий: <a href="https://github.com/">https://github.com/</a> указать URL своего репозитория</div>
+        <div class="mb-3">Репозиторий: <a href="https://github.com/bv201285/otus-bitrix24">https://github.com/bv201285/otus-bitrix24</a> указать URL своего репозитория</div>
         <ul class="item-list">
             <li>
                 <h2 class="item done">
                     <a href="homework1/">ДЗ #1: Создание и настройка проекта в VScode</a>
                     <i class="icon"></i>
+                    <span> --- (10 баллов)</span>
                 </h2>
             </li>
             <li>
-                <h2 class="item clock"><a href="homework2/">ДЗ #2: Отладка и логирование</a>
+                <h2 class="item done">
+                    <a href="homework2/">ДЗ #2: Отладка и логирование</a>
                     <i class="icon"></i>
+                    <span> --- (10 баллов)</span>
                 </h2>
             </li>
             <li>
