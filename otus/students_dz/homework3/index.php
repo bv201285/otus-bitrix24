@@ -1,23 +1,39 @@
 <?php
 
 global $APPLICATION;
+
 use Bitrix\Main\Page\Asset;
+use Bitrix\Iblock\IblockTable;
+use Bitrix\Main\Loader;
+
+use App\Models\Lists\DoctorsPropertyValuesTable;
 
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php");
-
 $APPLICATION->SetTitle("ДЗ #3: Связывание моделей");
 
 Asset::getInstance()->addString('<script src="https://cdn.tailwindcss.com"></script>');
 
-// Эмуляция данных из Битрикс (например, из $arResult["ITEMS"])
-$doctors = [
-        ['NAME' => 'Александр', 'LAST_NAME' => 'Коновалов', 'SPEC' => 'Терапевт', 'INFO' => 'Кандидат наук'],
-        ['NAME' => 'Иван', 'LAST_NAME' => 'Сергеев', 'SPEC' => 'Кардиолог', 'INFO' => 'Стаж 15 лет'],
-        ['NAME' => 'Мария', 'LAST_NAME' => 'Власова', 'SPEC' => 'Педиатр', 'INFO' => 'Высшая категория'],
-        ['NAME' => 'Олег', 'LAST_NAME' => 'Степанов', 'SPEC' => 'Невролог', 'INFO' => 'Стаж 22 года'],
-        ['NAME' => 'Юлия', 'LAST_NAME' => 'Дмитриева', 'SPEC' => 'Стоматолог', 'INFO' => 'Хирург-имплантолог'],
-        ['NAME' => 'Артем', 'LAST_NAME' => 'Лукьянов', 'SPEC' => 'Офтальмолог', 'INFO' => 'Лазерный хирург'],
-];
+
+
+$doctorsCollection = DoctorsPropertyValuesTable::query()
+        ->setSelect([
+                '*',
+                'PROCEDURES_COLLECTION',
+                'PROCEDURES_COLLECTION.ELEMENT'
+        ])
+        ->fetchCollection();
+
+//dd($doctorsCollection);
+
+foreach ($doctorsCollection as $doctor) {
+    foreach ($doctor->Get('PROCEDURES_COLLECTION')->getAll() as $item) {
+        dump($item->getElement()->getName());
+    }
+
+}
+
+
+
 
 // Массив цветовых схем Tailwind
 $colorSchemes = [
@@ -80,7 +96,7 @@ $colorSchemes = [
         <!-- Сетка карточек с PHP циклом -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
 
-            <?php foreach ($doctors as $i => $doctor):
+            <?php foreach ($doctorsCollection as $i => $doctor):
                 // Выбираем схему по остатку от деления
                 $scheme = $colorSchemes[$i % count($colorSchemes)];
                 ?>
@@ -98,16 +114,16 @@ $colorSchemes = [
                     <div class="p-8 flex flex-col flex-grow text-center">
                         <!-- Динамический цвет текста специализации -->
                         <span class="<?= $scheme['text'] ?> text-[10px] font-black uppercase tracking-[0.2em] mb-3">
-                            <?= $doctor['SPEC'] ?>
+                            <?= $doctor->getSpecialization()->getValue() ?>
                         </span>
 
                         <!-- Динамический цвет при наведении на имя -->
                         <h3 class="text-xl font-bold text-gray-900 mb-1 <?= $scheme['hoverText'] ?> transition-colors">
-                            <?= $doctor['NAME'] ?> <br> <?= $doctor['LAST_NAME'] ?>
+                            <?= $doctor->getName() ?>
                         </h3>
 
                         <div class="flex items-center justify-center space-x-1 mt-3 mb-6">
-                            <span class="text-xs font-medium text-gray-400"><?= $doctor['INFO'] ?></span>
+                            <span class="text-xs font-medium text-gray-400"><?= $doctor->getCategory()->getValue() ?></span>
                         </div>
 
                         <!-- Динамический цвет кнопки при наведении -->
@@ -123,3 +139,6 @@ $colorSchemes = [
         </div>
     </div>
 </div>
+
+
+<?php require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/footer.php"); ?>
