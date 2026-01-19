@@ -1,7 +1,12 @@
-<? use Bitrix\Main\Page\Asset;
-
-require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php"); ?>
 <?php
+
+use Bitrix\Main\Page\Asset;
+
+require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php");
+
+/**
+ * @global \CMain $APPLICATION
+ */
 $APPLICATION->SetTitle("Список Домашних работ");
 
 Asset::getInstance()->addCss('//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css');
@@ -38,8 +43,8 @@ Asset::getInstance()->addCss('//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bo
 
     <section class="container-fluid">
 
-        <h1 class="mb-3"><? $APPLICATION->ShowTitle() ?></h1>
-        <div class="mb-3">Репозиторий: <a href="https://github.com/bv201285/otus-bitrix24">https://github.com/bv201285/otus-bitrix24</a> указать URL своего репозитория</div>
+        <h1 class="mb-3"><?php $APPLICATION->ShowTitle() ?></h1>
+        <div class="mb-3">Репозиторий: <a href="https://github.com/bv201285/otus-bitrix24">https://github.com/bv201285/otus-bitrix24</a></div>
         <ul class="item-list">
             <li>
                 <h2 class="item done">
@@ -56,8 +61,9 @@ Asset::getInstance()->addCss('//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bo
                 </h2>
             </li>
             <li>
-                <h2 class="item proc"><a href="homework3/">ДЗ #3: Связывание моделей</a>
+                <h2 class="item done"><a href="homework3/">ДЗ #3: Связывание моделей</a>
                     <i class="icon"></i>
+                    <span> --- (10 баллов)</span>
                 </h2>
             </li>
             <li>
