@@ -1,4 +1,5 @@
 <?php
+global $APPLICATION;
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php");
 
 use App\Models\Orm\PropuskTable;
@@ -8,6 +9,8 @@ use Bitrix\Main\Data\Cache;
 use Bitrix\Main\Engine\CurrentUser;
 use Bitrix\Main\Page\Asset;
 use Bitrix\Main\Entity\ReferenceField;
+
+$APPLICATION->SetTitle("ДЗ #4: Создание своих таблиц БД и написание модели данных к ним");
 
 Asset::getInstance()->addString('<script src="https://cdn.tailwindcss.com"></script>');
 

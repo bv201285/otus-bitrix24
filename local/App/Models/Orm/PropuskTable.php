@@ -25,17 +25,21 @@ class PropuskTable extends DataManager
         return [
             (new IntegerField('ID'))
                 ->configurePrimary()
-                ->configureAutocomplete(),
+                ->configureAutocomplete()
+                ->configureTitle('ID'),
 
             (new StringField('TITLE'))
                 ->configureRequired()
-                ->configureSize(255),
+                ->configureSize(255)
+                ->configureTitle('Наименование'),
+
 
             (new DateField('VALIDITY_PERIOD'))
                 ->configureDefaultValue(function() {
                     // Создаем дату: 31 декабря текущего года
                     return new Date(date('Y') . '-12-31', 'Y-m-d');
-                }),
+                })
+                ->configureTitle('Действует до'),
 
             (new IntegerField('DOCTOR_ID'))
                 ->configureRequired(),
@@ -48,6 +52,7 @@ class PropuskTable extends DataManager
                 DoctorsPropertyValuesTable::class,
                 Join::on('this.DOCTOR_ID', 'ref.IBLOCK_ELEMENT_ID')
             ))
+                ->configureTitle('Доктор')
 
             /*(new Reference(
                 'BUILDINGS',
