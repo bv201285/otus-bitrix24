@@ -1,9 +1,12 @@
 <?php
+global $APPLICATION;
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/header.php");
 
 use App\Models\Lists\DoctorsPropertyValuesTable;
 use App\Models\Lists\ProceduresPropertyValuesTable;
 use Bitrix\Main\Page\Asset;
+
+$APPLICATION->SetTitle("ДЗ #3: Связывание моделей");
 
 Asset::getInstance()->addString('<script src="https://cdn.tailwindcss.com"></script>');
 
