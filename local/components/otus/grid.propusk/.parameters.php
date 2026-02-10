@@ -9,12 +9,6 @@ $arComponentParameters = [
         ]
     ],
     'PARAMETERS' => [
-        'GRID_ID' => [
-            'PARENT' => 'SETTINGS',
-            'NAME' => Loc::getMessage('GRID_ID'),
-            'TYPE' => 'STRING',
-            'DEFAULT' => '',
-        ],
         'SHOW_CHECKBOXES' =>  [
             'PARENT' => 'SETTINGS',
             'NAME' => Loc::getMessage('SHOW_CHECKBOXES'),

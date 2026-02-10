@@ -15,7 +15,7 @@ $APPLICATION->IncludeComponent(
     "",
     [
         'SHOW_CHECKBOXES' => 'Y',
-        'GRID_ID' => 'grid_propusk',
+        'GRID_ID' => 'PROPUSK_GRID',
     ]
 );
 
