@@ -3,21 +3,19 @@
 use App\Models\Lists\BuildingsPropertyValuesTable;
 use App\Models\Lists\DoctorsPropertyValuesTable;
 use App\Models\Orm\PropuskTable;
-use Bitrix\Main\Application;
 use Bitrix\Main\Engine\Contract\Controllerable;
 use Bitrix\Main\Engine\ActionFilter;
 use Bitrix\Main\Entity\ReferenceField;
 use Bitrix\Main\Grid\Panel\Actions;
 use Bitrix\Main\Grid\Panel\Snippet\Onchange;
+use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\ORM\Fields\ScalarField;
-use Bitrix\Main\SystemException;
+use Bitrix\UI\Buttons\Color;
 
-if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
+class PropuskGrid extends CBitrixComponent implements Controllerable {
 
-class GridPropuskComponent extends CBitrixComponent implements Controllerable {
-    private $_request;
+    protected const GRID_ID = 'PROPUSK_GRID';
 
-    // 1. Описываем конфиг (какие фильтры применять к запросу)
     public function configureActions(): array
     {
         return [
@@ -31,10 +29,7 @@ class GridPropuskComponent extends CBitrixComponent implements Controllerable {
         ];
     }
 
-    /**
-     * @throws Exception
-     */
-    public function deleteItemsAction(array $ids)
+    public function deleteItemsAction(array $ids): array
     {
         foreach ($ids as $id) {
             // Ваша логика удаления
@@ -47,32 +42,149 @@ class GridPropuskComponent extends CBitrixComponent implements Controllerable {
         ];
     }
 
-
-    /**
-     * Проверка наличия модулей требуемых для работы компонента
-     * @return bool
-     * @throws Exception
-     */
-    private function checkModules(): bool
+    public function onPrepareComponentParams($arParams): mixed
     {
-        /*if (   !Loader::includeModule('iblock')
-            || !Loader::includeModule('sale')
-        ) {
-            throw new \Exception('Не загружены модули необходимые для работы модуля');
-        }*/
-
-        return true;
+        // тут пишем логику обработки параметров, дополнение параметрами по умолчанию
+        // и прочие нужные вещи
+        return $arParams;
     }
 
-    /**
-     * @throws SystemException
-     */
-    private function checkRequiredParams(): void
+    public function executeComponent(): void
     {
-        if (!$this->arParams['GRID_ID']) {
-            // Генерируем исключение, если параметр пустой
-            throw new SystemException("Ошибка: Параметр 'ID таблицы' является обязательным.");
+        $gridOptions = new \Bitrix\Main\Grid\Options(self::GRID_ID);
+
+        // Названия колонок грида
+        $this->arResult['COLUMNS'] = $this->prepareColumns();
+
+        // Вывод в EXCEL
+        if ($this->request->get('EXPORT_MODE') == 'Y') {
+            $this->setTemplateName('excel');
         }
+
+        // Выгрузка в EXCEL только по тем колонкам, которые выбраны в данный момент
+        $this->arResult['USED_COLUMNS'] = $gridOptions->getUsedColumns($this->arResult['COLUMNS']);
+
+        // Параметр компонента "показывать checkbox"
+        if($this->arParams['SHOW_CHECKBOXES'] == 'Y'){
+            $this->arResult['SHOW_ROW_CHECKBOXES'] = true;
+        }else{
+            $this->arResult['SHOW_ROW_CHECKBOXES'] = false;
+        }
+
+        // Идентификатор для самого грида и фильтра
+        $this->arResult['GRID_ID'] = self::GRID_ID;
+
+        // Дополнительные кнопки управления в Toolbar
+        $this->arResult['BUTTONS'] = $this->getButtons();
+
+        // Поля фильтра
+        $this->arResult['FILTER_FIELDS'] = $this->prepareFilterFields();
+
+        // Параметры сортировки грида
+        $sort = $gridOptions->GetSorting(['sort' => ['ID' => 'DESC'], 'vars' => ['by' => 'by', 'order' => 'order']]);
+        $this->arResult['SORT'] = $sort['sort'];
+
+        // Работа с пагинацией
+        $nav = new \Bitrix\Main\UI\PageNavigation(self::GRID_ID);
+        $nav->allowAllRecords(true)
+            ->setPageSize($gridOptions->GetNavParams()['nPageSize'])
+            ->initFromUri();
+
+        // Выборка данных
+        $filterOptions = new \Bitrix\Main\UI\Filter\Options(self::GRID_ID);
+        $gridFilter = $filterOptions->getFilter();
+        $ormFilter = $this->prepareOrmFilter($gridFilter);
+
+        // Выборка данных через getList
+        /*$query = PropuskTable::getList([
+            'select'      => ['ID', 'TITLE', 'VALIDITY_PERIOD', 'DOCTOR_NAME' => 'DOCTOR.ELEMENT.NAME'],
+            'filter'      => $ormFilter,
+            'order'       => $this->arResult['SORT'],
+            'offset'      => $nav->getOffset(),
+            'limit'       => $nav->getLimit(),
+            'count_total' => true,
+        ]);
+        $nav->setRecordCount($query->getCount());
+        $this->arResult['ROWS'] = $this->prepareRowsGrid($query);*/
+
+        // Выборка данных через query
+        $query = PropuskTable::query()
+            ->setSelect([
+                'ID',
+                'TITLE',
+                'VALIDITY_PERIOD',
+                'DOCTOR_NAME' => 'DOCTOR.ELEMENT.NAME',
+                'BUILDINGS_NAME' => 'BUILDINGS.ELEMENT.NAME',
+            ])
+            ->registerRuntimeField(
+                null,
+                new ReferenceField(
+                    'BUILDINGS',
+                    BuildingsPropertyValuesTable::getEntity(),
+                    ['=this.BUILDINGS_ID' => 'ref.IBLOCK_ELEMENT_ID']
+                )
+            )
+            ->setFilter($ormFilter)
+            ->setOrder($this->arResult['SORT'])
+            ->setOffset($nav->getOffset())
+            ->setLimit($nav->getLimit())
+            ->countTotal(true);
+
+        $resultQuery = $query->exec();
+
+        $nav->setRecordCount($resultQuery->getCount());
+
+        $this->arResult['NAV_OBJECT'] = $nav;
+        $this->arResult['TOTAL_ROWS_COUNT'] = $resultQuery->getCount();
+
+        // Формирование строк (Rows) для Grid
+        $this->arResult['ROWS'] = $this->prepareRowsGrid($resultQuery);
+
+        // Кнопки групповых дейтсвий
+        $actionDelete = new Onchange();
+        $actionDelete->addAction(
+            [
+                'ACTION' => Actions::CALLBACK,
+                'CONFIRM' => true,
+                'CONFIRM_APPLY_BUTTON'  => 'Подтвердить',
+                'DATA' => [
+                    //Будет инициализирован в template.php
+                    ['JS' => 'PropuskGridHandler.removeSelected()']
+                    // Пример: просто перезагрузить грид
+                    //['JS' => "BX.Main.gridManager.getById('".$this->arResult['GRID_ID']."').instance.reload();"]
+
+                ]
+            ]
+        );
+        $this->arResult['ACTION_PANEL']  =[
+            'GROUPS' => [
+                'TYPE' => [
+                    'ITEMS' => [
+                        [
+                            'ID' => 'DELETE_ITEM',
+                            'TYPE' => 'BUTTON',
+                            'TEXT' => 'Удалить',
+                            'CLASS' => 'ui-btn ui-btn-danger-light',
+                            //'ONCHANGE' => $arResult['ACTION_DELETE'],
+                            'ONCHANGE' => $actionDelete -> toArray(),
+                        ],
+                    ],
+                ]
+            ],
+        ];
+        $this->includeComponentTemplate();
+
+    }
+
+    protected function getButtons(): array
+    {
+        return [
+            [
+                'onclick' => new \Bitrix\UI\Buttons\JsCode('PropuskGridHandler.redirectToExcel()'),
+                'text' => Loc::getMessage('EXPORT_XLSX_BUTTON_TITLE'),
+                'color' => Color::PRIMARY,
+            ],
+        ];
     }
 
     private function prepareColumns() : array
@@ -120,59 +232,46 @@ class GridPropuskComponent extends CBitrixComponent implements Controllerable {
         return $columns;
     }
 
-    /**
-     * @throws \Bitrix\Main\ObjectPropertyException
-     * @throws SystemException
-     * @throws \Bitrix\Main\ArgumentException
-     */
     private function prepareFilterFields(): array
     {
         return [
-            // Поле типа Число (будет содержать варианты "равно", "больше", "меньше", "диапазон")
             [
                 'id'      => 'ID',
                 'name'    => 'ID',
                 'type'    => 'number',
                 'default' => true, // Поле будет отображаться в фильтре сразу по умолчанию
             ],
-            // Поле типа Строка
             [
                 'id'      => 'TITLE',
                 'name'    => 'Наименование',
                 'type'    => 'text',
                 'default' => true,
             ],
-            // Поле типа Дата (автоматически добавит календарь и диапазоны "Вчера", "Сегодня", "Месяц")
             [
                 'id'      => 'VALIDITY_PERIOD',
                 'name'    => 'Действует до',
                 'type'    => 'date',
                 'default' => true,
             ],
-            // Поле типа Список (Dropdown)
             [
                 'id'      => 'DOCTOR_ID',
                 'name'    => 'Врач',
                 'type'    => 'list',
-                'items'   => $this->getDoctorsList(), // Динамически получаем список врачей
-                'params'  => ['multiple' => 'Y'], // Разрешаем выбор нескольких врачей
+                'items'   => $this->getDoctorsList(),
+                'params'  => ['multiple' => 'Y'],
                 'default' => true,
             ],
-            // Поле типа Список (Dropdown)
             [
                 'id'      => 'BUILDINGS_ID',
                 'name'    => 'Здание',
                 'type'    => 'list',
-                'items'   => $this->getBuildingsList(), // Динамически получаем список врачей
-                'params'  => ['multiple' => 'Y'], // Разрешаем выбор нескольких врачей
+                'items'   => $this->getBuildingsList(),
+                'params'  => ['multiple' => 'Y'],
                 'default' => true,
             ],
         ];
     }
 
-    /**
-     * Вспомогательный метод для получения списка врачей в фильтр
-     */
     private function getDoctorsList(): array
     {
         $doctors = [];
@@ -188,11 +287,6 @@ class GridPropuskComponent extends CBitrixComponent implements Controllerable {
         return $doctors;
     }
 
-    /**
-     * @throws \Bitrix\Main\ObjectPropertyException
-     * @throws SystemException
-     * @throws \Bitrix\Main\ArgumentException
-     */
     private function getBuildingsList(): array
     {
         $buildings = [];
@@ -236,7 +330,7 @@ class GridPropuskComponent extends CBitrixComponent implements Controllerable {
 
             // 3. Обработка диапазонов (Числа и Даты)
             // Битрикс добавляет суффиксы _from и _to для полей типа 'number' и 'date'
-            if (strpos($key, '_from') !== false) {
+            if (str_contains($key, '_from')) {
                 $originalField = str_replace('_from', '', $key);
                 if (in_array($originalField, $allowedFields)) {
                     $ormFilter['>=' . $originalField] = $value;
@@ -244,7 +338,7 @@ class GridPropuskComponent extends CBitrixComponent implements Controllerable {
                 continue;
             }
 
-            if (strpos($key, '_to') !== false) {
+            if (str_contains($key, '_to')) {
                 $originalField = str_replace('_to', '', $key);
                 if (in_array($originalField, $allowedFields)) {
                     // Если это дата, для корректного поиска до конца дня добавляем время
@@ -289,144 +383,5 @@ class GridPropuskComponent extends CBitrixComponent implements Controllerable {
         return $arRows;
     }
 
-    /**
-     * Подготовка параметров компонента
-     * @param $arParams
-     * @return mixed
-     */
-    public function onPrepareComponentParams($arParams): mixed
-    {
-        // тут пишем логику обработки параметров, дополнение параметрами по умолчанию
-        // и прочие нужные вещи
-        return $arParams;
-    }
 
-    /**
-     * Точка входа в компонент
-     * Должна содержать только последовательность вызовов вспомогательых ф-ий и минимум логики
-     * всю логику стараемся разносить по классам и методам
-     */
-    public function executeComponent(): void
-    {
-
-        try {
-            //dd($this->_request);
-
-            $this->_request = Application::getInstance()->getContext()->getRequest();
-
-            $this->checkRequiredParams();
-            //$this->checkModules();
-
-            $this->arResult['GRID_ID'] = $this->arParams['GRID_ID'];
-
-            if($this->arParams['SHOW_CHECKBOXES'] == 'Y'){
-                $this->arResult['SHOW_ROW_CHECKBOXES'] = true;
-            }else{
-                $this->arResult['SHOW_ROW_CHECKBOXES'] = false;
-            }
-
-            // 1. Формируем колонки
-            $this->arResult['COLUMNS'] = $this->prepareColumns();
-
-            // 2. Работа с фильтром
-            $this->arResult['FILTER_FIELDS'] = $this->prepareFilterFields();
-            $filterOptions = new \Bitrix\Main\UI\Filter\Options($this->arResult['GRID_ID']);
-            $gridFilter = $filterOptions->getFilter();
-            // Преобразуем фильтр из UI-формата в формат для ORM getList
-            $ormFilter = $this->prepareOrmFilter($gridFilter);
-
-            // 3. Работа с сортировкой
-            $gridOptions = new \Bitrix\Main\Grid\Options($this->arResult['GRID_ID']);
-            $sort = $gridOptions->GetSorting(['sort' => ['ID' => 'DESC'], 'vars' => ['by' => 'by', 'order' => 'order']]);
-            $this->arResult['SORT'] = $sort['sort'];
-
-            // 4. Работа с пагинацией (PageNavigation)
-            $nav = new \Bitrix\Main\UI\PageNavigation('nav-params');
-            $nav->allowAllRecords(true)
-                ->setPageSize($gridOptions->GetNavParams()['nPageSize'])
-                ->initFromUri();
-
-            // 5. Выборка данных через ORM
-            /*$query = PropuskTable::getList([
-                'select'      => ['ID', 'TITLE', 'VALIDITY_PERIOD', 'DOCTOR_NAME' => 'DOCTOR.ELEMENT.NAME'],
-                'filter'      => $ormFilter,
-                'order'       => $this->arResult['SORT'],
-                'offset'      => $nav->getOffset(),
-                'limit'       => $nav->getLimit(),
-                'count_total' => true,
-            ]);
-            $nav->setRecordCount($query->getCount());
-            $this->arResult['ROWS'] = $this->prepareRowsGrid($query);*/
-
-            $query = PropuskTable::query()
-                ->setSelect([
-                    'ID',
-                    'TITLE',
-                    'VALIDITY_PERIOD',
-                    'DOCTOR_NAME' => 'DOCTOR.ELEMENT.NAME',
-                    'BUILDINGS_NAME' => 'BUILDINGS.ELEMENT.NAME',
-                ])
-                ->registerRuntimeField(
-                    null,
-                    new ReferenceField(
-                        'BUILDINGS',
-                        BuildingsPropertyValuesTable::getEntity(),
-                        ['=this.BUILDINGS_ID' => 'ref.IBLOCK_ELEMENT_ID']
-                    )
-                )
-                ->setFilter($ormFilter)
-                ->setOrder($this->arResult['SORT'])
-                ->setOffset($nav->getOffset())
-                ->setLimit($nav->getLimit())
-                ->countTotal(true);
-
-            $resultQuery = $query->exec();
-
-            $nav->setRecordCount($resultQuery->getCount());
-
-            $this->arResult['NAV_OBJECT'] = $nav;
-            $this->arResult['TOTAL_ROWS_COUNT'] = $resultQuery->getCount();
-
-            // 6. Формирование строк (Rows) для Grid
-            $this->arResult['ROWS'] = $this->prepareRowsGrid($resultQuery);
-
-            // 7. Кнопка Action Сообщить
-
-
-            $actionDelete = new Onchange();
-            $actionDelete->addAction(
-                [
-                    'ACTION' => Actions::CALLBACK,
-                    'CONFIRM' => true,
-                    'CONFIRM_APPLY_BUTTON'  => 'Подтвердить',
-                    'DATA' => [
-                        //Будет инициализирован в template.php
-                        ['JS' => 'PropuskGridHandler.removeSelected()']
-                        // Пример: просто перезагрузить грид
-                        //['JS' => "BX.Main.gridManager.getById('".$this->arResult['GRID_ID']."').instance.reload();"]
-
-                    ]
-                ]
-            );
-            $this->arResult['ACTION_DELETE'] =  $actionDelete->toArray();
-
-
-            //dump($sort);
-
-
-
-            $this->includeComponentTemplate();
-        }
-        catch (SystemException $e) {
-            ShowError($e->getMessage());
-        }
-
-
-
-
-
-
-
-
-    }
 }

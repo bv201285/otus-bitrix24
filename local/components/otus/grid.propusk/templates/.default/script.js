@@ -26,8 +26,9 @@ class PropuskGrid {
             // Включаем индикатор загрузки и затемняем таблицу
             grid.getLoader().show();
             grid.tableFade();
+            console.log(grid.getLoader());
 
-            const response = await BX.ajax.runComponentAction('otus:grid.propusk', 'deleteItems', {
+            /*const response = await BX.ajax.runComponentAction('otus:grid.propusk', 'deleteItems', {
                 mode: 'class',
                 data: {
                     ids: selectedIds
@@ -42,7 +43,7 @@ class PropuskGrid {
                 alert(`Ошибка: ${error}`);
                 // Если ошибка, нужно вернуть таблицу в активное состояние
                 grid.tableUnfade();
-            }
+            }*/
         } catch (error) {
             console.error('Grid Action Error:', error);
             grid.tableUnfade();
@@ -93,4 +94,23 @@ class PropuskGrid {
             if (grid) grid.getLoader().hide();
         }
     }
+
+    /**
+     * Экспорт в Excel с сохранением текущих фильтров
+     */
+    redirectToExcel() {
+        // 1. Получаем текущие параметры из строки запроса
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // 2. Добавляем (или обновляем) параметр EXPORT_MODE
+        urlParams.set('EXPORT_MODE', 'Y');
+
+        // 3. Формируем новый URL, используя текущий путь (pathname) и обновленные параметры
+        const exportUrl = window.location.pathname + '?' + urlParams.toString();
+
+        // 4. Перенаправляем (браузер начнет скачивание, так как компонент отдаст Excel-заголовки)
+        window.open(exportUrl, '_self');
+    }
+
+
 }
