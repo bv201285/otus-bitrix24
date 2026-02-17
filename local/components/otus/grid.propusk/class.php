@@ -6,13 +6,27 @@ use App\Models\Orm\PropuskTable;
 use Bitrix\Main\Engine\Contract\Controllerable;
 use Bitrix\Main\Engine\ActionFilter;
 use Bitrix\Main\Entity\ReferenceField;
+use Bitrix\Main\Errorable;
+use Bitrix\Main\ErrorableImplementation;
+use Bitrix\Main\ErrorCollection;
 use Bitrix\Main\Grid\Panel\Actions;
 use Bitrix\Main\Grid\Panel\Snippet\Onchange;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\ORM\Fields\ScalarField;
+use Bitrix\UI\Buttons\Button;
 use Bitrix\UI\Buttons\Color;
+use Bitrix\UI\Buttons\JsCode;
+use Bitrix\Main\Error;
 
-class PropuskGrid extends CBitrixComponent implements Controllerable {
+class PropuskGrid extends CBitrixComponent implements Controllerable, Errorable {
+
+    use ErrorableImplementation;
+
+    public function __construct($component = null)
+    {
+        parent::__construct($component);
+        $this->errorCollection = new ErrorCollection();
+    }
 
     protected const GRID_ID = 'PROPUSK_GRID';
 
@@ -26,7 +40,61 @@ class PropuskGrid extends CBitrixComponent implements Controllerable {
                     new ActionFilter\Csrf(),
                 ],
             ],
+            'addPropusk' => []
         ];
+    }
+
+    public function listKeysSignedParameters(): array
+    {
+        return [
+            'GRID_ID',
+            'PREFIX'
+        ];
+    }
+
+    public function addPropuskAction(array $data)
+    {
+        try {
+            $propuskTitle = $this->arParams['PREFIX'] . ' ' . (string)$data['TITLE'];
+            $doctorID = (int)$data['DOCTOR_ID'];
+            $buildingsID = (int)$data['BUILDINGS_ID'];
+
+            if ($propuskTitle === '') {
+                $this->errorCollection->add([new Error('Не передано наименование')]);
+                return [];
+            }
+
+            if ($doctorID <= 0) {
+                $this->errorCollection->add([new Error('Не передан доктор')]);
+                return [];
+            }
+
+            if ($buildingsID <= 0) {
+                $this->errorCollection->add([new Error('Не передано здание')]);
+                return [];
+            }
+
+            $addResult = PropuskTable::add([
+                'TITLE' => $propuskTitle,
+                'DOCTOR_ID' => $doctorID,
+                'BUILDINGS_ID' => $buildingsID,
+            ]);
+
+            if (!$addResult->isSuccess()) {
+                $errors = [];
+                foreach ($addResult->getErrorMessages() as $msg) {
+                    $errors[] = new Error($msg);
+                }
+                $this->errorCollection->add($errors);
+                return [];
+            }
+
+            return ['PROPUSK_ID' => $addResult->getId()];
+        }
+        catch (\Throwable $e) {
+            $this->errorCollection->add([new Error($e->getMessage())]);
+            return [];
+        }
     }
 
     public function deleteItemsAction(array $ids): array
@@ -178,12 +246,44 @@ class PropuskGrid extends CBitrixComponent implements Controllerable {
 
     protected function getButtons(): array
     {
+        $btnDropdown = new Button([
+            'text' => 'Действия',
+            'color' => Color::SUCCESS,
+            'dropdown' => true,
+            'menu' => [
+                'items' => [
+                    [
+                        'text' => 'Добавить пропуск (ajax.php)',
+                        'onclick' => new JsCode('PropuskGridHandler.addPropusk(true)'),
+                    ],
+                    [
+                        'text' => 'Добавить пропуск 2 (ajax.php)',
+                        'onclick' => new JsCode('PropuskGridHandler.addPropusk2(true)'),
+                    ],
+                    [
+                        'text' => 'Добавить пропуск (class.php)',
+                        'onclick' => new JsCode('PropuskGridHandler.addPropusk(false)'),
+                    ],
+                    [
+                        'text' => 'Редактировать',
+                        'disabled' => true
+                    ],
+                    ['delimiter' => true],
+                    [
+                        'text' => 'Уничтожить',
+                        'onclick' => new JsCode('PropuskGridHandler.addBook()'),
+                    ],
+                ],
+            ]
+        ]);
+
         return [
             [
                 'onclick' => new \Bitrix\UI\Buttons\JsCode('PropuskGridHandler.redirectToExcel()'),
                 'text' => Loc::getMessage('EXPORT_XLSX_BUTTON_TITLE'),
                 'color' => Color::PRIMARY,
             ],
+            $btnDropdown,
         ];
     }
 
@@ -284,6 +384,9 @@ class PropuskGrid extends CBitrixComponent implements Controllerable {
             $doctors[$row['IBLOCK_ELEMENT_ID']] = $row['NAME'];
         }
 
+        // Для дальнейшего выбора в выпадающем спсиске модалок
+        $this->arResult['DOCTORS'] = $doctors;
+
         return $doctors;
     }
 
@@ -298,6 +401,9 @@ class PropuskGrid extends CBitrixComponent implements Controllerable {
             //dump($row);
             $buildings[$row['IBLOCK_ELEMENT_ID']] = $row['NAME'];
         }
+
+        // Для дальнейшего выбора в выпадающем спсиске модалок
+        $this->arResult['BUILDINGS'] = $buildings;
 
         return $buildings;
     }

@@ -1,9 +1,17 @@
 <?php
+if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 
+\Bitrix\Main\UI\Extension::load([
+        'ui.buttons',
+        'ui.toolbar',
+        'ui.dropdown', // можно добавить на всякий случай для меню
+]);
+
+use Bitrix\Main\Web\Json;
 use Bitrix\UI\Toolbar\Facade\Toolbar;
 
-if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true)
-    die();
+
+
 
 /**
  * @var array $arResult
@@ -64,11 +72,21 @@ $APPLICATION->includeComponent(
 
     ]
 );
+
+$configPropuskGridHandler = [
+    'gridId' => $arResult['GRID_ID'],
+    'doctors' => $arResult['DOCTORS'],
+    'buildings' => $arResult['BUILDINGS'],
+    'signedParameters' => $this->getComponent()->getSignedParameters(),
+];
+
+$configPropuskGridHandler = Json::encode($configPropuskGridHandler, JSON_UNESCAPED_UNICODE);
+
 ?>
 
 <script>
     if (typeof PropuskGrid !== 'undefined') {
-    window.PropuskGridHandler = new PropuskGrid('<?= \CUtil::JSEscape($arResult['GRID_ID']) ?>');
+    window.PropuskGridHandler = new PropuskGrid(<?= $configPropuskGridHandler ?>);
     } else {
     console.error('Ошибка: Класс PropuskGrid не загружен. Проверьте подключение script.js');
 }
