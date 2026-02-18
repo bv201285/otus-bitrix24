@@ -73,22 +73,24 @@ Asset::getInstance()->addCss('//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bo
                 </h2>
             </li>
             <li>
-                <h2 class="item clock"><a href="homework5/">ДЗ #5: Компонент списка таблицы БД (курс валюты)</a>
+                <h2 class="item done"><a href="homework5/">ДЗ #5: Компонент списка таблицы БД (курс валюты)</a>
+                    <i class="icon"></i>
+                    <span> --- (10 баллов)</span>
+                </h2>
+            </li>
+            <li>
+                <h2 class="item done"><a href="homework5_2/">ДЗ #5_2: Компонент списка таблицы БД (доп. Grid - пропуска)</a>
+                    <i class="icon"></i>
+                    <span> --- (10 баллов)</span>
+                </h2>
+            </li>
+            <li>
+                <h2 class="item clock"><a href="#">ДЗ #6: Написание своего модуля</a>
                     <i class="icon"></i>
                 </h2>
             </li>
             <li>
-                <h2 class="item clock"><a href="homework5_2/">ДЗ #5_2: Компонент списка таблицы БД (доп. Grid - пропуска)</a>
-                    <i class="icon"></i>
-                </h2>
-            </li>
-            <li>
-                <h2 class="item"><a href="homework6/">ДЗ #6: Написание своего модуля</a>
-                    <i class="icon"></i>
-                </h2>
-            </li>
-            <li>
-                <h2 class="item"><a href="homework7/">ДЗ #7: Создание кастомных полей и встраивание их в систему - в процессе</a>
+                <h2 class="item"><a href="homework7/">ДЗ #7: Создание кастомных полей и встраивание их в систему</a>
                     <div class="prog proc"></div>
                 </h2>
             </li>
@@ -98,7 +100,7 @@ Asset::getInstance()->addCss('//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bo
                 </h2>
             </li>
             <li>
-                <h2 class="item"><a href="homework9/">ДЗ #9: Написание своих активити для БП - на проверке! </a>
+                <h2 class="item"><a href="homework9/">ДЗ #9: Написание своих активити для БП</a>
                     <i class="icon"></i>
                 </h2>
             </li>
@@ -119,4 +121,5 @@ Asset::getInstance()->addCss('//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bo
             </li>
         </ul>
     </section>
-<? require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/footer.php"); ?>
+
+<?php require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/footer.php"); ?>

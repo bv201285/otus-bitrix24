@@ -78,4 +78,5 @@
 /workgroups/
 /vendor
 /local/logs/
+**/node_modules/
 

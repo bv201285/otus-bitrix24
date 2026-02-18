@@ -10,9 +10,6 @@ if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 use Bitrix\Main\Web\Json;
 use Bitrix\UI\Toolbar\Facade\Toolbar;
 
-
-
-
 /**
  * @var array $arResult
  * @var array $arParams
@@ -35,14 +32,6 @@ Toolbar::addFilter([
         'ENABLE_LIVE_SEARCH' => true,
         'ENABLE_LABEL' => true
 ]);
-
-/*$APPLICATION->IncludeComponent('bitrix:main.ui.filter', '', [
-    'FILTER_ID' => $arResult['GRID_ID'],
-    'GRID_ID' => $arResult['GRID_ID'],
-    'FILTER' => $arResult['FILTER_FIELDS'],
-    'ENABLE_LIVE_SEARCH' => true,
-    'ENABLE_LABEL' => true
-]);*/
 
 $APPLICATION->includeComponent(
     "bitrix:main.ui.grid",
@@ -85,9 +74,7 @@ $configPropuskGridHandler = Json::encode($configPropuskGridHandler, JSON_UNESCAP
 ?>
 
 <script>
-    if (typeof PropuskGrid !== 'undefined') {
-    window.PropuskGridHandler = new PropuskGrid(<?= $configPropuskGridHandler ?>);
-    } else {
-    console.error('Ошибка: Класс PropuskGrid не загружен. Проверьте подключение script.js');
-}
+    window.PropuskGridHandlers = window.PropuskGridHandlers || {};
+    window.PropuskGridHandlers['<?= \CUtil::JSEscape($arResult['GRID_ID']) ?>'] =
+        new PropuskGrid(<?= $configPropuskGridHandler ?>);
 </script>
