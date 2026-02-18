@@ -7,7 +7,7 @@ use Bitrix\Main\Page\Asset;
 
 $APPLICATION->SetTitle('ДЗ #5_2: Компонент списка таблицы БД (доп. Grid - пропуска)');
 
-Asset::getInstance()->addString('<script src="https://cdn.tailwindcss.com"></script>');
+//Asset::getInstance()->addString('<script src="https://cdn.tailwindcss.com"></script>');
 
 
 $APPLICATION->IncludeComponent(

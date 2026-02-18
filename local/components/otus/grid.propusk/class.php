@@ -13,6 +13,7 @@ use Bitrix\Main\Grid\Panel\Actions;
 use Bitrix\Main\Grid\Panel\Snippet\Onchange;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\ORM\Fields\ScalarField;
+use Bitrix\Main\Page\Asset;
 use Bitrix\UI\Buttons\Button;
 use Bitrix\UI\Buttons\Color;
 use Bitrix\UI\Buttons\JsCode;
@@ -27,8 +28,6 @@ class PropuskGrid extends CBitrixComponent implements Controllerable, Errorable 
         parent::__construct($component);
         $this->errorCollection = new ErrorCollection();
     }
-
-    protected const GRID_ID = 'PROPUSK_GRID';
 
     public function configureActions(): array
     {
@@ -119,13 +118,23 @@ class PropuskGrid extends CBitrixComponent implements Controllerable, Errorable 
 
     public function executeComponent(): void
     {
-        $gridOptions = new \Bitrix\Main\Grid\Options(self::GRID_ID);
+        // Идентификатор для самого грида и фильтра
+        $this->arResult['GRID_ID'] = $this->arParams['GRID_ID'] ?? 'PROPUSK_GRID';
+
+        // JS handler на объект конкретного экземпляра grid
+        $handlerJS = $this->getJsHandlerExpr();
+
+        $gridOptions = new \Bitrix\Main\Grid\Options($this->arResult['GRID_ID']);
 
         // Названия колонок грида
         $this->arResult['COLUMNS'] = $this->prepareColumns();
 
         // Вывод в EXCEL
-        if ($this->request->get('EXPORT_MODE') == 'Y') {
+        if ($this->request->get('EXPORT_MODE') !== 'Y') {
+            // Tailwind CSS собранный вами
+            Asset::getInstance()->addCss('/local/assets/css/tailwind-bx.css');
+        }
+        else{
             $this->setTemplateName('excel');
         }
 
@@ -139,9 +148,6 @@ class PropuskGrid extends CBitrixComponent implements Controllerable, Errorable 
             $this->arResult['SHOW_ROW_CHECKBOXES'] = false;
         }
 
-        // Идентификатор для самого грида и фильтра
-        $this->arResult['GRID_ID'] = self::GRID_ID;
-
         // Дополнительные кнопки управления в Toolbar
         $this->arResult['BUTTONS'] = $this->getButtons();
 
@@ -153,13 +159,13 @@ class PropuskGrid extends CBitrixComponent implements Controllerable, Errorable 
         $this->arResult['SORT'] = $sort['sort'];
 
         // Работа с пагинацией
-        $nav = new \Bitrix\Main\UI\PageNavigation(self::GRID_ID);
+        $nav = new \Bitrix\Main\UI\PageNavigation($this->arResult['GRID_ID']);
         $nav->allowAllRecords(true)
             ->setPageSize($gridOptions->GetNavParams()['nPageSize'])
             ->initFromUri();
 
         // Выборка данных
-        $filterOptions = new \Bitrix\Main\UI\Filter\Options(self::GRID_ID);
+        $filterOptions = new \Bitrix\Main\UI\Filter\Options($this->arResult['GRID_ID']);
         $gridFilter = $filterOptions->getFilter();
         $ormFilter = $this->prepareOrmFilter($gridFilter);
 
@@ -208,7 +214,7 @@ class PropuskGrid extends CBitrixComponent implements Controllerable, Errorable 
         // Формирование строк (Rows) для Grid
         $this->arResult['ROWS'] = $this->prepareRowsGrid($resultQuery);
 
-        // Кнопки групповых дейтсвий
+        // Кнопки групповых действий
         $actionDelete = new Onchange();
         $actionDelete->addAction(
             [
@@ -217,7 +223,7 @@ class PropuskGrid extends CBitrixComponent implements Controllerable, Errorable 
                 'CONFIRM_APPLY_BUTTON'  => 'Подтвердить',
                 'DATA' => [
                     //Будет инициализирован в template.php
-                    ['JS' => 'PropuskGridHandler.removeSelected()']
+                    ['JS' => "{$handlerJS}.removeSelected()"]
                     // Пример: просто перезагрузить грид
                     //['JS' => "BX.Main.gridManager.getById('".$this->arResult['GRID_ID']."').instance.reload();"]
 
@@ -240,12 +246,19 @@ class PropuskGrid extends CBitrixComponent implements Controllerable, Errorable 
                 ]
             ],
         ];
+
+        // Подключаем общий скрипт для всех шаблонов
+        Asset::getInstance()->addJs($this->getPath() . '/script.js');
+
         $this->includeComponentTemplate();
 
     }
 
     protected function getButtons(): array
     {
+        // JS handler на объект конкретного экземпляра grid
+        $handlerJS = $this->getJsHandlerExpr();
+
         $btnDropdown = new Button([
             'text' => 'Действия',
             'color' => Color::SUCCESS,
@@ -254,32 +267,24 @@ class PropuskGrid extends CBitrixComponent implements Controllerable, Errorable 
                 'items' => [
                     [
                         'text' => 'Добавить пропуск (ajax.php)',
-                        'onclick' => new JsCode('PropuskGridHandler.addPropusk(true)'),
+                        'onclick' => new JsCode("{$handlerJS}.addPropusk(true)"),
                     ],
                     [
                         'text' => 'Добавить пропуск 2 (ajax.php)',
-                        'onclick' => new JsCode('PropuskGridHandler.addPropusk2(true)'),
-                    ],
-                    [
-                        'text' => 'Добавить пропуск (class.php)',
-                        'onclick' => new JsCode('PropuskGridHandler.addPropusk(false)'),
-                    ],
-                    [
-                        'text' => 'Редактировать',
-                        'disabled' => true
+                        'onclick' => new JsCode("{$handlerJS}.addPropusk2(true)"),
                     ],
                     ['delimiter' => true],
                     [
-                        'text' => 'Уничтожить',
-                        'onclick' => new JsCode('PropuskGridHandler.addBook()'),
-                    ],
+                        'text' => 'Добавить пропуск (class.php)',
+                        'onclick' => new JsCode("{$handlerJS}.addPropusk(false)"),
+                    ]
                 ],
             ]
         ]);
 
         return [
             [
-                'onclick' => new \Bitrix\UI\Buttons\JsCode('PropuskGridHandler.redirectToExcel()'),
+                'onclick' => new \Bitrix\UI\Buttons\JsCode("{$handlerJS}.redirectToExcel()"),
                 'text' => Loc::getMessage('EXPORT_XLSX_BUTTON_TITLE'),
                 'color' => Color::PRIMARY,
             ],
@@ -474,6 +479,10 @@ class PropuskGrid extends CBitrixComponent implements Controllerable, Errorable 
     }
 
     private function prepareRowsGrid($resultQuery): array{
+
+        // JS handler на объект конкретного экземпляра grid
+        $handlerJS = $this->getJsHandlerExpr();
+
         $arRows = [];
         foreach ($resultQuery->fetchAll() as $row) {
             $arRows[] = [
@@ -481,12 +490,20 @@ class PropuskGrid extends CBitrixComponent implements Controllerable, Errorable 
                 'actions' => [ // Кнопки действий (Меню)
                     [
                         'text'    => 'Удалить',
-                        'onclick' => "PropuskGridHandler.removeOne(" . (int)$row['ID'] . ")"
+                        'onclick' => "{$handlerJS}.removeOne(" . (int)$row['ID'] . ")"
                     ],
                 ]
             ];
         }
         return $arRows;
+    }
+
+    private function getJsHandlerExpr(): string
+    {
+        $gridId = (string)($this->arResult['GRID_ID'] ?? $this->arParams['GRID_ID'] ?? 'PROPUSK_GRID');
+        $gridIdJs = \CUtil::JSEscape($gridId);
+
+        return "window.PropuskGridHandlers['{$gridIdJs}']";
     }
 
 

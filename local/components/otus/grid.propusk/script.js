@@ -1,6 +1,4 @@
-
 class PropuskGrid {
-
 
     constructor(options = {}) {
         this._addPropuskModal = null;
@@ -209,30 +207,32 @@ class PropuskGrid {
                 class="rounded-md px-2 py-1 text-gray-500 hover:bg-gray-100 hover:text-gray-900">✕</button>
             </div>
     
-            <form id="propusk-add-form2" class="px-5 py-4 space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Наименование</label>
-                <input name="TITLE" required type="text"
-                  class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm
-                         focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                  placeholder="Наименование">
-              </div>
-    
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Доктор</label>
-                <select name="DOCTOR_ID" required
-                  class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
-                  ${doctorsOptionsHtml}
-                </select>
-              </div>
-    
-              <div>
-                <label class="block text-sm font-medium text-gray-700">Здание</label>
-                <select name="BUILDINGS_ID" required
-                  class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
-                  ${buildingsOptionsHtml}
-                </select>
-              </div>
+            <form id="propusk-add-form2">
+              <div class="px-5 py-4 space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700">Наименование</label>
+                    <input name="TITLE" required type="text"
+                      class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm
+                             focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                      placeholder="Наименование">
+                  </div>
+        
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700">Доктор</label>
+                    <select name="DOCTOR_ID" required
+                      class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
+                      ${doctorsOptionsHtml}
+                    </select>
+                  </div>
+        
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700">Здание</label>
+                    <select name="BUILDINGS_ID" required
+                      class="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm">
+                      ${buildingsOptionsHtml}
+                    </select>
+                  </div>
+              </div>              
             </form>
     
             <div class="flex items-center justify-end gap-2 border-t px-5 py-4">
