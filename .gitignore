@@ -78,5 +78,10 @@
 /workgroups/
 /vendor
 /local/logs/
+/bizprocdesigner/
+/collaboration/
+/online/
+/vibe/
+/vote-result/
 **/node_modules/
 

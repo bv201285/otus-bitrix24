@@ -12,6 +12,14 @@ class Handlers
     public static function updateTabs(Event $event): EventResult
     {
         $tabs = $event->getParameter('tabs');
+
+        \Bitrix\Main\Diag\Debug::writeToFile(
+            $tabs,
+            'log data',
+            '/local/logs/crm_tabs.log'
+        );
+
+
         $isModuleActive = Option::get(self::MID, 'ACTIVE', 'N');
         $isModuleActive = $isModuleActive === 'Y';
         $availableEntityTypeIds = explode(
@@ -50,5 +58,30 @@ class Handlers
         }
 
         return new EventResult(EventResult::SUCCESS, ['tabs' => $tabs]);
+    }
+
+    public static function updateMain(Event $event): EventResult
+    {
+        $config = $event->getParameter('configuration'); // массив конфигурации editor'а
+        \Bitrix\Main\Diag\Debug::writeToFile(
+            $config,
+            'log data',
+            '/local/logs/crm_tabs.log'
+        );
+
+        $entityTypeId = (int)$event->getParameter('entityTypeID');
+        if ($entityTypeId === \CCrmOwnerType::Deal) {
+            dd($config);
+        }
+
+        $config = $event->getParameter('configuration'); // массив конфигурации editor'а
+
+        // Дальше нужно добавить section / element в нужное место.
+        // Внутри обычно элементы вида: ['name' => '...', 'type' => 'section', 'elements' => [...]]
+        // Для кастомного HTML обычно используют type='custom' и JS-рендер.
+
+        return new EventResult(\Bitrix\Main\EventResult::SUCCESS, [
+            'configuration' => $config
+        ]);
     }
 }
