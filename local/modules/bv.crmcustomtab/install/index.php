@@ -13,7 +13,7 @@ class bv_crmcustomtab extends \CModule
         $this->MODULE_VERSION = '1.0.1';
         $this->MODULE_VERSION_DATE = '2026-02-18';
         $this->PARTNER_NAME = 'BV';
-        $this->PARTNER_URI = 'https://rudold.by';
+        $this->PARTNER_URI = 'https://rudolf.by';
     }
 
     public function DoInstall()
@@ -39,6 +39,14 @@ class bv_crmcustomtab extends \CModule
             '\\BV\\Crmcustomtab\\Crm\\Handlers',
             'updateTabs'
         );
+
+        $eventManager->registerEventHandler(
+            'crm',
+            'OnEntityEditorConfiguration',
+            $this->MODULE_ID,
+            '\\BV\\Crmcustomtab\\Crm\\Handlers',
+            'updateMain'
+        );
     }
 
     public function UnInstallEvents(): void
@@ -51,6 +59,14 @@ class bv_crmcustomtab extends \CModule
             $this->MODULE_ID,
             '\\BV\\Crmcustomtab\\Crm\\Handlers',
             'updateTabs'
+        );
+
+        $eventManager->unRegisterEventHandler(
+            'crm',
+            'OnEntityEditorConfiguration',
+            $this->MODULE_ID,
+            '\\BV\\Crmcustomtab\\Crm\\Handlers',
+            'updateMain'
         );
     }
 }
