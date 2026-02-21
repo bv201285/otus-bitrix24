@@ -73,8 +73,8 @@ class SmartDependentIBlockField
           </div>
 
           <script>
-            window.SmartDepInitQueue = window.SmartDepInitQueue || [];
-            window.SmartDepInitQueue.push({
+            window.SDC_InitQueue = window.SDC_InitQueue || [];
+            window.SDC_InitQueue.push({
               rootId: "'.\CUtil::JSEscape($uid).'",
               stored: '.\Bitrix\Main\Web\Json::encode([
                 'mode' => $mode,
@@ -82,7 +82,7 @@ class SmartDependentIBlockField
                 'value' => $val,
             ]).'
             });
-            if (window.SmartDepInitAll) window.SmartDepInitAll();
+            if (window.SDC_InitAll) { window.SDC_InitAll(); }
           </script>
         </div>';
     }
