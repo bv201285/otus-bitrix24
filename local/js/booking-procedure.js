@@ -103,15 +103,16 @@
         BX.ajax.runComponentAction('otus:booking.procedure', 'createBooking', {
             mode: 'class',
             data: { doctorId, procedureId, date, clientName }
-        }).then(function () {
+        }).then(function (response) {
             popup.close();
             notify('Бронирование создано');
 
             if (submitBtn) submitBtn.classList.remove('ui-btn-wait');
 
-            setTimeout(() => {
-                window.location.href = '/services/lists/20/view/0/';
-            }, 300);
+            const redirect = response && response.data && response.data.redirect ? response.data.redirect : null;
+            if (redirect) {
+                setTimeout(() => { window.location.href = redirect; }, 300);
+            }
 
         }).catch(function (err) {
             console.error(err);

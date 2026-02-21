@@ -116,7 +116,12 @@ class BookingProcPopupComponent extends CBitrixComponent implements Controllerab
             return [];
         }
 
-        return ['success' => true];
+        $bookingIblockId = BookingPropertyValuesTable::getIblockId();
+
+        return [
+            'success' => true,
+            'redirect' => "/services/lists/{$bookingIblockId}/view/0/",
+        ];
     }
 
     private function getElementName(int $id): string
