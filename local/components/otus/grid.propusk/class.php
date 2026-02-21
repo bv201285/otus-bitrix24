@@ -11,6 +11,7 @@ use Bitrix\Main\ErrorableImplementation;
 use Bitrix\Main\ErrorCollection;
 use Bitrix\Main\Grid\Panel\Actions;
 use Bitrix\Main\Grid\Panel\Snippet\Onchange;
+use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\ORM\Fields\ScalarField;
 use Bitrix\Main\Page\Asset;
@@ -118,6 +119,9 @@ class PropuskGrid extends CBitrixComponent implements Controllerable, Errorable 
 
     public function executeComponent(): void
     {
+
+        Loader::includeModule('iblock');
+
         // Идентификатор для самого грида и фильтра
         $this->arResult['GRID_ID'] = $this->arParams['GRID_ID'] ?? 'PROPUSK_GRID';
 
