@@ -166,8 +166,7 @@ class BookingProcPopupComponent extends CBitrixComponent implements Controllerab
 
 
         // dateString у вас в формате d.m.Y H:i:s
-        $dt = DateTime::createFromFormat('d.m.Y H:i:s', $dateString);
-        dd($dt);
+        $dt = $dt = \DateTime::createFromFormat('d.m.Y H:i:s', $dateString);
         if (!$dt) {
             return false;
         }
