@@ -165,10 +165,11 @@ class BookingProcPopupComponent extends CBitrixComponent implements Controllerab
 
         // dateString у вас в формате d.m.Y H:i:s
         $dt = \DateTime::createFromFormat('d.m.Y H:i:s', $dateString);
-        dd($dt);
         if (!$dt) {
             return false;
         }
+
+        dd('!!!');
 
         // ВНИМАНИЕ: в фильтрах для DateTime лучше использовать формат БД
         $from = $dt->format('Y-m-d H:i:s');
