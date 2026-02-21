@@ -23,8 +23,8 @@ class BookingProcedure
 
     public static function GetPublicViewHTML($arProperty, $value, $strHTMLControlName): string
     {
-        Asset::getInstance()->addJs('/local/js/booking-procedure.js');
-        Asset::getInstance()->addCss('/local/assets/css/booking-procedure.css');
+        Asset::getInstance()->addJs('/local/js/booking-procedure/booking-procedure.js');
+        Asset::getInstance()->addCss('/local/assets/css/booking-procedure/booking-procedure.css');
 
 
         $doctorId = (int)($arProperty['ELEMENT_ID'] ?? 0);
