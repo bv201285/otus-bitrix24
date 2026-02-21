@@ -169,11 +169,11 @@ class BookingProcPopupComponent extends CBitrixComponent implements Controllerab
             return false;
         }
 
-        dd('!!!');
-
         // ВНИМАНИЕ: в фильтрах для DateTime лучше использовать формат БД
         $from = $dt->format('Y-m-d H:i:s');
         $to   = $dt->format('Y-m-d H:i:s');
+
+        dd($from, $to);
 
         $res = \CIBlockElement::GetList(
             [],
