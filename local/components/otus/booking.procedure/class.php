@@ -70,7 +70,7 @@ class BookingProcPopupComponent extends CBitrixComponent implements Controllerab
      */
     public function createBookingAction(int $doctorId, int $procedureId, string $date, string $clientName): array
     {
-        dump($doctorId, $procedureId, $date, $clientName);
+        dd($doctorId, $procedureId, $date, $clientName);
 
         if (!Loader::includeModule('iblock')) {
             $this->errorCollection->add([new Error('Ошибка загрузки модуля битрикс Инф блок.')]);
