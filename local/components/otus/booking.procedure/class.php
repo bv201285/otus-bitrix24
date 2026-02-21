@@ -173,7 +173,7 @@ class BookingProcPopupComponent extends CBitrixComponent implements Controllerab
         $from = $dt->format('Y-m-d H:i:s');
         $to   = $dt->format('Y-m-d H:i:s');
 
-        dd($from, $to);
+
 
         $res = \CIBlockElement::GetList(
             [],
@@ -188,6 +188,7 @@ class BookingProcPopupComponent extends CBitrixComponent implements Controllerab
             ['nTopCount' => 1],
             ['ID']
         );
+        dd((bool)$res->Fetch());
 
         return (bool)$res->Fetch();
     }
