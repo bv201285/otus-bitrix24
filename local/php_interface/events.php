@@ -7,7 +7,7 @@ use Bitrix\Main\EventManager;
 
 $eventManager = EventManager::getInstance();
 
-$eventManager->addEventHandler(
+/*$eventManager->addEventHandler(
     '',
     'App\Models\Orm\Propusk::OnBeforeAdd',
     function(Event $event) {
@@ -17,6 +17,26 @@ $eventManager->addEventHandler(
         $result = new EventResult();
         return $result;
     }
+);*/
+
+
+// пользовательский тип для свойства инфоблока
+$eventManager->AddEventHandler(
+    'iblock',
+    'OnIBlockPropertyBuildList',
+    [
+        'App\UserTypes\BookingProcedure', // класс обработчик пользовательского типа свойства
+        'GetUserTypeDescription'
+    ]
 );
 
+// пользовательский тип для UF поля
+/*$eventManager->AddEventHandler(
+    'main',
+    'OnUserTypeBuildList',
+    [
+        'UserTypes\FormatTelegramLink', // класс обработчик пользовательского типа UF поля
+        'GetUserTypeDescription'
+    ]
+);*/
 

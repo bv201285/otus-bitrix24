@@ -305,8 +305,6 @@ class PropuskGrid {
 
             const id = response?.data?.PROPUSK_ID;
 
-            //console.log(response);
-
             BX.UI.Notification.Center.notify({
                 content: `Добавлен пропуск с ID=${id}`,
             });
@@ -316,7 +314,6 @@ class PropuskGrid {
 
             return id; // успех
         } catch (reject) {
-            //console.log(reject)
 
             // Приводим ошибку к читаемому виду (Bitrix обычно кидает объект с errors)
             const msg =
@@ -324,16 +321,14 @@ class PropuskGrid {
                     ? reject.errors.map(e => e.message).join('\n')
                     : (reject?.message || 'Ошибка добавления');
 
-            alert(msg);
+            BX.UI.Notification.Center.notify({
+                content: msg,
+            });
 
             // важно: пробрасываем ошибку дальше, чтобы click: async мог НЕ закрывать popup
             throw reject;
         }
     }
-
-
-
-
 
     _showModal(modal) {
         modal.classList.remove('hidden');
