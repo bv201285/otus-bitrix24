@@ -1,0 +1,48 @@
+/* Обертка всего поля */
+.smart-dep{
+    font-family: var(--ui-font-family-primary, Arial, sans-serif);
+}
+
+/* Строка (блок) поля */
+.smart-dep__row{
+    margin-bottom: 12px;
+}
+
+/* Подпись */
+.smart-dep__label{
+    font-size: 12px;
+    line-height: 16px;
+    color: #525c69;
+    margin-bottom: 6px;
+}
+
+/* Контейнер для второго контрола (select/input) */
+.smart-dep [data-role="valueContainer"] .ui-ctl{
+    width: 100%;
+}
+
+/* Небольшая подсказка/плейсхолдер, который вы выводите как div */
+.smart-dep__hint{
+    margin-top: 6px;
+    font-size: 11px;
+    line-height: 14px;
+    color: #a8adb4;
+}
+
+/* Если захотите показывать ошибки валидации/серверные ошибки */
+.smart-dep__error{
+    margin-top: 6px;
+    font-size: 12px;
+    line-height: 16px;
+    color: #ff5752;
+}
+
+/* Чуть более аккуратный вид выпадашек/инпутов в списках */
+.smart-dep .ui-ctl-element{
+    box-sizing: border-box;
+}
+
+/* На узких колонках в гриде, чтобы поле не "ломало" верстку */
+.smart-dep{
+    min-width: 240px; /* можно убрать, если не нужно */
+}
