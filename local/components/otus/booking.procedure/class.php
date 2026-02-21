@@ -163,10 +163,8 @@ class BookingProcPopupComponent extends CBitrixComponent implements Controllerab
     {
         $bookingIblockId = BookingPropertyValuesTable::getIblockId();
 
-
-
         // dateString у вас в формате d.m.Y H:i:s
-        $dt = $dt = \DateTime::createFromFormat('d.m.Y H:i:s', $dateString);
+        $dt = \DateTime::createFromFormat('d.m.Y H:i:s', $dateString);
         if (!$dt) {
             return false;
         }
