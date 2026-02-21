@@ -103,7 +103,7 @@
         BX.ajax.runComponentAction('otus:booking.procedure', 'createBooking', {
             mode: 'class',
             data: { doctorId, procedureId, date, clientName }
-        }).then(function () {
+        }).then(function (response) {
             popup.close();
             notify('Бронирование создано');
 
