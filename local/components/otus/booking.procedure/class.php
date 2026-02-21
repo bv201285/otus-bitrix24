@@ -188,7 +188,6 @@ class BookingProcPopupComponent extends CBitrixComponent implements Controllerab
             ['nTopCount' => 1],
             ['ID']
         );
-        dd((bool)$res->Fetch());
 
         return (bool)$res->Fetch();
     }
