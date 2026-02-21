@@ -1,0 +1,63 @@
+.booking-modal{
+    font-family: var(--ui-font-family-primary, Arial, sans-serif);
+}
+
+.booking-modal__header{
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid #eef2f4;
+}
+
+.booking-modal__title{
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.booking-modal__subtitle{
+    font-size: 13px;
+    color: #525c69;
+    line-height: 1.4;
+}
+
+.booking-modal__label{
+    color: #a8adb4;
+    margin-right: 6px;
+}
+
+.booking-modal__body{
+    padding: 14px 16px;
+}
+
+.booking-field{
+    margin-bottom: 14px;
+}
+
+.booking-field__label{
+    font-size: 12px;
+    color: #525c69;
+    margin-bottom: 6px;
+}
+
+.booking-field__hint{
+    margin-top: 6px;
+    font-size: 11px;
+    color: #a8adb4;
+}
+
+.booking-date{
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.booking-date__input{
+    width: 100%;
+}
+
+.booking-modal__footer{
+    padding: 12px 16px;
+    border-top: 1px solid #eef2f4;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
