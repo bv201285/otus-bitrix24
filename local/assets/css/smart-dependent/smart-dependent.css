@@ -1,11 +1,65 @@
-/* Обертка всего поля */
-.smart-dep{
+/* Контейнер вывода (view) */
+.sdc-view{
     font-family: var(--ui-font-family-primary, Arial, sans-serif);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
-/* Строка (блок) поля */
+/* Один элемент значения */
+.sdc-view__item{
+    padding: 6px 10px;
+    border: 1px solid #e7e9ec;
+    border-radius: 6px;
+    background: #e2e8f0;
+    font-size: 13px;
+    line-height: 18px;
+    color: #333;
+}
+
+/* Если renderReadable возвращает ссылку/подсказки — можно подправить */
+.sdc-view__item a{
+    color: #2067b0;
+    text-decoration: none;
+}
+.sdc-view__item a:hover{
+    text-decoration: underline;
+}
+
+
+/* Обертка всего поля — делаем "сетку" из строк */
+.smart-dep{
+    font-family: var(--ui-font-family-primary, Arial, sans-serif);
+
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;              /* расстояние между .smart-dep__row */
+    align-items: flex-start;
+
+    /* min-width: 240px;  // лучше убрать с контейнера, иначе адаптивность хуже */
+}
+
+/* Каждый блок поля */
 .smart-dep__row{
-    margin-bottom: 12px;
+    margin-bottom: 0;       /* gap теперь отвечает за отступы */
+
+    flex: 1 1 280px;        /* базовая ширина колонки; будет ужиматься/переноситься */
+    min-width: 240px;       /* минимальная ширина одного блока */
+}
+
+/* Если нужно, чтобы на широких экранах было ровно 2 в ряд */
+@media (min-width: 900px){
+    .smart-dep__row{
+        flex: 0 0 calc(50% - 6px); /* 2 в ряд (поправка под gap) */
+    }
+}
+
+/* На очень узких — строго по одной */
+@media (max-width: 520px){
+    .smart-dep__row{
+        flex: 1 1 100%;
+        min-width: 0;
+    }
 }
 
 /* Подпись */
