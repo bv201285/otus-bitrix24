@@ -1,0 +1,82 @@
+.ddpt__tablewrap{
+    overflow-x: auto;
+}
+
+/* ===== Таблица (общая: и edit, и view) ===== */
+.ddpt__table{
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--ui-font-family-primary, Arial, sans-serif);
+    table-layout: fixed; /* чтобы колонки не "прыгали" */
+}
+
+.ddpt__table th,
+.ddpt__table td{
+    border: 1px solid #e7e9ec;
+    padding: 8px;
+    vertical-align: top;
+    word-wrap: break-word;
+}
+
+.ddpt__table th{
+    background: #f8fafc;
+    font-size: 12px;
+    color: #525c69;
+    text-align: left;
+}
+
+/* ===== Экшены под таблицей (edit) ===== */
+.ddpt__actions{
+    margin-top: 10px;
+}
+
+/* ===== View-режим: можно чуть “чище” фон ===== */
+.ddpt__table--view td{
+    background: #f0f4ea;
+}
+
+/* ===== Колонка удаления (edit) ===== */
+/* Переопределяем общие стили td только для колонки с крестиком */
+.ddpt__table td.ddpt__col-del{
+    width: 34px;              /* узкая колонка */
+    padding: 0;               /* чтобы крестик был строго по центру */
+    text-align: center;       /* центр по горизонтали */
+    vertical-align: middle;   /* центр по вертикали */
+}
+
+/* Кнопка-крестик */
+.ddpt__del{
+    display: inline-block;    /* работает с text-align:center */
+    width: 20px;
+    height: 20px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+    opacity: .7;
+    vertical-align: middle;
+}
+
+.ddpt__del:hover{ opacity: 1; }
+
+.ddpt__del::before,
+.ddpt__del::after{
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 14px;
+    height: 2px;
+    background: #a8adb4;
+    transform-origin: center;
+    border-radius: 2px;
+}
+
+.ddpt__del::before{ transform: translate(-50%, -50%) rotate(45deg); }
+.ddpt__del::after { transform: translate(-50%, -50%) rotate(-45deg); }
+
+.ddpt__del:hover::before,
+.ddpt__del:hover::after{
+    background: #ff5752;
+}

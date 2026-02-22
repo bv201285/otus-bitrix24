@@ -20,4 +20,7 @@ $eventManager->AddEventHandler('iblock','OnIBlockPropertyBuildList',
 $eventManager->AddEventHandler('main','OnUserTypeBuildList',
     ['App\UserTypes\SmartDependentUfField', 'GetUserTypeDescription']
 );
+$eventManager->AddEventHandler('main','OnUserTypeBuildList',
+    ['App\UserTypes\DealDoctorsProceduresTableUfField', 'GetUserTypeDescription']
+);
 
