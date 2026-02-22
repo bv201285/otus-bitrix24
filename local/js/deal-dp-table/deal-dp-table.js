@@ -20,72 +20,98 @@
         root.dataset.ddptInited = 'Y';
 
         const tbody = root.querySelector('[data-role="tbody"]');
-        const store = root.querySelector('[data-role="store"]');
         const addBtn = root.querySelector('[data-role="addRow"]');
-        if (!tbody || !store || !addBtn) return true;
+        if (!tbody || !addBtn) return true;
 
+        // store может быть несколько (CRM иногда клонирует) — берём все
+        const getStores = () => root.querySelectorAll('input[data-role="store"]');
+
+        const makeId = () => String(Date.now()) + '_' + Math.random().toString(16).slice(2);
+
+        // --- state ---
         const state = {
-            rows: Array.isArray(cfg.rows) ? cfg.rows : [],
-            doctors: null,
-            procedures: null,
+            rows: [],
+            doctors: [],
+            procedures: [],
         };
 
-        // Грузим справочники параллельно
-        Promise.all([
-            loadIblock('Doctors'),
-            loadIblock('Procedure'),
-        ]).then(([doctors, procedures]) => {
-            state.doctors = doctors;
-            state.procedures = procedures;
+        // нормализуем входящие строки
+        const inputRows = Array.isArray(cfg.rows) ? cfg.rows : [];
+        state.rows = (inputRows.length ? inputRows : [{}]).map(r => ({
+            __id: (r && r.__id) ? String(r.__id) : makeId(),
+            doctorId: (r && r.doctorId != null) ? String(r.doctorId) : '',
+            procedureId: (r && r.procedureId != null) ? String(r.procedureId) : '',
+            date: (r && r.date != null) ? String(r.date) : '',
+            text: (r && r.text != null) ? String(r.text) : '',
+        }));
 
-            renderAll();
-        }).catch(err => {
-            console.error('DDPT load error', err);
-            state.doctors = [];
-            state.procedures = [];
-            renderAll();
-        });
-
-        addBtn.addEventListener('click', () => {
-            state.rows.push({ doctorId: '', procedureId: '', date: '', text: '' });
-            renderAll();
-        });
-
-        function renderAll() {
-            tbody.innerHTML = '';
-            const doctors = state.doctors || [];
-            const procedures = state.procedures || [];
-
-            state.rows.forEach((row, idx) => {
-                tbody.appendChild(renderRow(row, idx, doctors, procedures));
-            });
-
-            syncStore();
+        function serializeForStore() {
+            // В БД сохраняем только нужные поля, без __id
+            return state.rows.map(r => ({
+                doctorId: r.doctorId || '',
+                procedureId: r.procedureId || '',
+                date: r.date || '',
+                text: r.text || ''
+            }));
         }
 
         function syncStore() {
-            store.value = JSON.stringify(state.rows);
+            const json = JSON.stringify(serializeForStore());
+
+            const stores = root.querySelectorAll('input[data-role="store"]');
+            stores.forEach((inp) => {
+                inp.value = json;
+
+                // 1) обычные события, чтобы CRM форма поняла, что поле изменилось
+                try {
+                    inp.dispatchEvent(new Event('input', { bubbles: true }));
+                    inp.dispatchEvent(new Event('change', { bubbles: true }));
+                } catch (e) {}
+
+                // 2) BX событие (на некоторых формах это важно)
+                if (window.BX && BX.fireEvent) {
+                    BX.fireEvent(inp, 'change');
+                    BX.fireEvent(inp, 'input');
+                }
+            });
         }
 
-        function renderRow(row, idx, doctors, procedures) {
+        function findRowIndexById(id) {
+            return state.rows.findIndex(r => r.__id === id);
+        }
+
+        function renderAll() {
+            tbody.innerHTML = '';
+            state.rows.forEach(r => tbody.appendChild(renderRow(r)));
+            syncStore();
+        }
+
+        function renderRow(row) {
             const tr = document.createElement('tr');
             tr.className = 'ddpt__tr';
+            tr.dataset.rowId = row.__id;
 
-            // doctor select
+            // doctor
             const tdDoc = document.createElement('td');
-            tdDoc.appendChild(makeSelect(doctors, row.doctorId, 'Выберите врача', (val) => {
+            tdDoc.appendChild(makeSelect(state.doctors, row.doctorId, 'Выберите врача', (val) => {
+                const idx = findRowIndexById(row.__id);
+                if (idx === -1) return;
                 state.rows[idx].doctorId = val;
                 syncStore();
             }));
             tr.appendChild(tdDoc);
 
-            // procedure select
-            /*const tdProc = document.createElement('td');
-            tdProc.appendChild(makeSelect(procedures, row.procedureId, 'Выберите процедуру', (val) => {
-                state.rows[idx].procedureId = val;
-                syncStore();
+            // procedure (если нужна — раскомментируй в шаблоне и здесь)
+            /*
+            const tdProc = document.createElement('td');
+            tdProc.appendChild(makeSelect(state.procedures, row.procedureId, 'Выберите процедуру', (val) => {
+              const idx = findRowIndexById(row.__id);
+              if (idx === -1) return;
+              state.rows[idx].procedureId = val;
+              syncStore();
             }));
-            tr.appendChild(tdProc);*/
+            tr.appendChild(tdProc);
+            */
 
             // date
             const tdDate = document.createElement('td');
@@ -96,6 +122,8 @@
             dateInp.type = 'date';
             dateInp.value = row.date || '';
             dateInp.addEventListener('change', () => {
+                const idx = findRowIndexById(row.__id);
+                if (idx === -1) return;
                 state.rows[idx].date = dateInp.value || '';
                 syncStore();
             });
@@ -113,6 +141,8 @@
             textInp.placeholder = 'Комментарий';
             textInp.value = row.text || '';
             textInp.addEventListener('input', () => {
+                const idx = findRowIndexById(row.__id);
+                if (idx === -1) return;
                 state.rows[idx].text = textInp.value || '';
                 syncStore();
             });
@@ -120,28 +150,22 @@
             tdText.appendChild(textWrap);
             tr.appendChild(tdText);
 
-            // remove (small cross)
+            // delete
             const tdDel = document.createElement('td');
             tdDel.className = 'ddpt__col-del';
-
             const delBtn = document.createElement('button');
             delBtn.type = 'button';
             delBtn.className = 'ddpt__del';
             delBtn.title = 'Удалить строку';
-            /*delBtn.innerHTML = '<span class="ui-icon ui-icon-service-close"><i></i></span>';*/
-            delBtn.innerHTML = '';
-
+            delBtn.innerHTML = ''; // крестик CSS
             delBtn.addEventListener('click', () => {
-                state.rows.splice(idx, 1);
-                if (state.rows.length === 0) {
-                    state.rows.push({ doctorId: '', procedureId: '', date: '', text: '' });
+                const id = row.__id;
+                state.rows = state.rows.filter(r => r.__id !== id);
+                if (!state.rows.length) {
+                    state.rows.push({ __id: makeId(), doctorId:'', procedureId:'', date:'', text:'' });
                 }
-
-                tbody.innerHTML = '';
-                state.rows.forEach((r, i) => tbody.appendChild(renderRow(r, i, doctors, procedures)));
-                syncStore();
+                renderAll(); // важно: именно renderAll(), чтобы пересобрать и store
             });
-
             tdDel.appendChild(delBtn);
             tr.appendChild(tdDel);
 
@@ -157,9 +181,7 @@
             sel.className = 'ui-ctl-element';
 
             let html = `<option value="">${esc(placeholder)}</option>`;
-            items.forEach(it => {
-                html += `<option value="${esc(it.id)}">${esc(it.name)}</option>`;
-            });
+            items.forEach(it => html += `<option value="${esc(it.id)}">${esc(it.name)}</option>`);
             sel.innerHTML = html;
 
             if (String(current || '') !== '') sel.value = String(current);
@@ -169,11 +191,30 @@
             return wrap;
         }
 
+        // add row
+        addBtn.addEventListener('click', () => {
+            state.rows.push({ __id: makeId(), doctorId:'', procedureId:'', date:'', text:'' });
+            renderAll();
+        });
+
+        // load dictionaries
+        Promise.all([loadIblock('Doctors'), loadIblock('Procedure')])
+            .then(([doctors, procedures]) => {
+                state.doctors = Array.isArray(doctors) ? doctors : [];
+                state.procedures = Array.isArray(procedures) ? procedures : [];
+                renderAll();
+            })
+            .catch(() => {
+                state.doctors = [];
+                state.procedures = [];
+                renderAll();
+            });
+
         return true;
     }
 
     function loadIblock(iblockApi) {
-        return BX.ajax.runComponentAction('otus:dp.table.data', 'getElements', {
+        return BX.ajax.runComponentAction('otus:main.field.deal_doctors_procedures_table', 'getElements', {
             mode: 'class',
             data: { iblockApi }
         }).then(res => (res && res.data && Array.isArray(res.data.items)) ? res.data.items : []);

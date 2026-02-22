@@ -64,7 +64,7 @@
             wrap.appendChild(select);
             cont.appendChild(wrap);
 
-            BX.ajax.runComponentAction('otus:smart.dependent', 'getElements', {
+            BX.ajax.runComponentAction('otus:main.field.smart_dependent', 'getElements', {
                 mode: 'class',
                 data: { iblockApi }
             }).then((res) => {
