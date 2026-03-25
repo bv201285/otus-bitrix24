@@ -1,0 +1,111 @@
+/* local/assets/css/primary-interest/primary-interest.css */
+
+/* ===== VIEW (main.view) ===== */
+.pi-view{
+    font-family: var(--ui-font-family-primary, Arial, sans-serif);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.pi-view__item{
+    padding: 6px 10px;
+    border: 1px solid #e7e9ec;
+    border-radius: 6px;
+    background: #e2e8f0;
+    font-size: 13px;
+    line-height: 18px;
+    color: #333;
+}
+
+/* ===== EDIT (main.edit) ===== */
+.primary-interest{
+    font-family: var(--ui-font-family-primary, Arial, sans-serif);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.primary-interest__row{
+    margin-bottom: 0;
+    flex: 1 1 280px;
+    min-width: 240px;
+}
+
+@media (min-width: 900px){
+    .primary-interest__row{
+        flex: 0 0 calc(50% - 6px);
+    }
+}
+
+@media (max-width: 520px){
+    .primary-interest__row{
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+}
+
+.primary-interest__label{
+    font-size: 12px;
+    line-height: 16px;
+    color: #525c69;
+    margin-bottom: 6px;
+}
+
+.primary-interest [data-role="valueContainer"] .ui-ctl{
+    width: 100%;
+}
+
+/* ===== AUTOCOMPLETE (dropdown in 2nd input) ===== */
+.pi-ac{
+    position: relative;
+    width: 100%;
+}
+
+/* сам dropdown */
+.pi-ac__dd{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 4px);
+    z-index: 1000;
+
+    background: #fff;
+    border: 1px solid #d5d7db;
+    border-radius: 6px;
+    box-shadow: 0 8px 18px rgba(0,0,0,.12);
+
+    max-height: 240px;
+    overflow: auto;
+    padding: 4px 0;
+
+    /* на всякий случай, если контейнер очень узкий */
+    box-sizing: border-box;
+}
+
+/* элемент подсказки */
+.pi-ac__item{
+    padding: 8px 10px;
+    font-size: 13px;
+    line-height: 18px;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pi-ac__item:hover{
+    background: #f1f5f9;
+}
+
+/* если захочешь показывать "Ничего не найдено" отдельным элементом */
+.pi-ac__item--empty{
+    color: #a8adb4;
+    cursor: default;
+}
+
+.pi-ac__item--empty:hover{
+    background: transparent;
+}

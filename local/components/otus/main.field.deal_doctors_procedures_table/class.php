@@ -6,10 +6,22 @@ use Bitrix\Iblock\ElementTable;
 use Bitrix\Iblock\IblockTable;
 use Bitrix\Main\Component\BaseUfComponent;
 use Bitrix\Main\Engine\Contract\Controllerable;
+use Bitrix\Main\Errorable;
+use Bitrix\Main\ErrorableImplementation;
+use Bitrix\Main\ErrorCollection;
+use Bitrix\Main\Error;
 use Bitrix\Main\Loader;
 
-class DealDoctorsProceduresTableUfComponent extends BaseUfComponent implements Controllerable
+class DealDoctorsProceduresTableUfComponent extends BaseUfComponent implements Controllerable, Errorable
 {
+    use ErrorableImplementation;
+
+    public function __construct($component = null)
+    {
+        parent::__construct($component);
+        $this->errorCollection = new ErrorCollection();
+    }
+
     protected static function getUserTypeId(): string
     {
         return DealDoctorsProceduresTableUfField::USER_TYPE_ID;
@@ -27,18 +39,18 @@ class DealDoctorsProceduresTableUfComponent extends BaseUfComponent implements C
         $iblockApi = trim($iblockApi);
 
         if ($iblockApi === '') {
-            $this->addError(new Error('Empty iblockApi'));
+            $this->errorCollection->add([new Error('Empty iblockApi')]);
             return [];
         }
 
         if (!Loader::includeModule('iblock')) {
-            $this->addError(new Error('Module iblock not available'));
+            $this->errorCollection->add([new Error('Module iblock not available')]);
             return [];
         }
 
         $allowed = ['Doctors' => true, 'Procedure' => true];
         if (!isset($allowed[$iblockApi])) {
-            $this->addError(new Error('Iblock not allowed'));
+            $this->errorCollection->add([new Error('Iblock not allowed')]);
             return [];
         }
 
@@ -47,7 +59,7 @@ class DealDoctorsProceduresTableUfComponent extends BaseUfComponent implements C
             'filter' => ['=API_CODE' => $iblockApi],
         ]);
         if (!$iblockRow) {
-            $this->addError(new Error('Iblock not found'));
+            $this->errorCollection->add([new Error('Iblock not found')]);
             return [];
         }
 

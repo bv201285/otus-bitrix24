@@ -15,3 +15,6 @@ if (file_exists(__DIR__ . '/../App/autoload.php'))
 // Events
 require __DIR__ . '/events.php';
 
+// JS Extensions
+require __DIR__ . '/js-ext.php';
+

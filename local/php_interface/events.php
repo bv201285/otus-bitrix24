@@ -8,6 +8,12 @@ use Bitrix\Main\Page\Asset;
 
 $eventManager = EventManager::getInstance();
 
+// OnBeforeProlog
+$eventManager->addEventHandler('main', 'OnBeforeProlog', static function () {
+    // Этот js выводит в консоль все custom-event которые срабатывают
+    //Asset::getInstance()->addJs('/local/js/find-on-custom-event/find-on-custom-event.js');
+});
+
 // Пользовательские типы для свойства инфоблока
 $eventManager->AddEventHandler('iblock','OnIBlockPropertyBuildList',
     ['App\UserTypes\BookingProcedure', 'GetUserTypeDescription']
@@ -23,4 +29,9 @@ $eventManager->AddEventHandler('main','OnUserTypeBuildList',
 $eventManager->AddEventHandler('main','OnUserTypeBuildList',
     ['App\UserTypes\DealDoctorsProceduresTableUfField', 'GetUserTypeDescription']
 );
+$eventManager->AddEventHandler('main','OnUserTypeBuildList',
+    ['App\UserTypes\PrimaryInterestUfField', 'GetUserTypeDescription']
+);
+
+
 
