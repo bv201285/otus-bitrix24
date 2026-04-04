@@ -103,7 +103,7 @@ Asset::getInstance()->addCss('//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bo
                 </h2>
             </li>
             <li>
-                <h2 class="item clock"><a href="homework9/">ДЗ #9: Написание своих активити для БП</a>
+                <h2 class="item clock"><a href="/services/lists/">ДЗ #9: Написание своих активити для БП</a>
                     <i class="icon"></i>
                 </h2>
             </li>
