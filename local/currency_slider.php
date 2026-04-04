@@ -10,12 +10,13 @@ $APPLICATION->SetTitle('ДЗ #5: Компонент списка таблицы 
 Asset::getInstance()->addString('<script src="https://cdn.tailwindcss.com"></script>');
 
 
-$APPLICATION->IncludeComponent(
-    'otus:currency',
-    "",
-    [
+// Для того чтобы подгружать эту страницу php в слайдере (BX.SidePanel) нужно компонент оборачивать следующим образом
+$APPLICATION->IncludeComponent('bitrix:ui.sidepanel.wrapper', '', [
+    'POPUP_COMPONENT_NAME' => 'otus:currency',
+    'POPUP_COMPONENT_TEMPLATE_NAME' => '',
+    'POPUP_COMPONENT_PARAMS' => [
         'CURRENCY' => 'USD',
-    ]
-);
+    ],
+]);
 
 require($_SERVER["DOCUMENT_ROOT"] . "/bitrix/footer.php");
