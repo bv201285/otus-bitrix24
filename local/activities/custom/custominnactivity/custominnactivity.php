@@ -1,5 +1,6 @@
 <?php if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) die();
 
+use App\Classes\Dadata;
 use Bitrix\Bizproc\Activity\BaseActivity;
 use Bitrix\Bizproc\FieldType;
 use Bitrix\Main\ErrorCollection;
@@ -51,13 +52,35 @@ class CBPCustomInnActivity extends BaseActivity
 
         $companyName = 'Компания не найдена!';
 
-        try {
+
+        // Вариант подключения DADATA через composer - не работает composer на хостинге от OTUS
+        /*try {
             $dadata = new DadataClient($token, $secret);
             $response = $dadata->findById("party", $this->Inn);
 
             if (!empty($response) && is_array($response)) {
 
                 $firstItem = current($response);
+
+                if ($firstItem && isset($firstItem['value'])) {
+                    $companyName = $firstItem['value'];
+                }
+
+            }
+        } catch (\Exception $e) {
+            $this->log('Dadata API Error: ' . $e->getMessage());
+        }*/
+
+        try {
+            $dadata = new Dadata($token, $secret);
+            $dadata->init();
+
+            $fields = array("query" => $this->Inn, "count" => 1);
+            $response = $dadata->findById("party", $fields);
+
+            if (!empty($response['suggestions']) && is_array($response['suggestions'])) {
+
+                $firstItem = current($response['suggestions']);
 
                 if ($firstItem && isset($firstItem['value'])) {
                     $companyName = $firstItem['value'];
