@@ -5,6 +5,7 @@ use Bitrix\Main\Entity\Event;
 use Bitrix\Main\ORM\EventResult;
 use Bitrix\Main\EventManager;
 use Bitrix\Main\Page\Asset;
+use Bitrix\Main\UI\Extension;
 
 $eventManager = EventManager::getInstance();
 
@@ -12,6 +13,9 @@ $eventManager = EventManager::getInstance();
 $eventManager->addEventHandler('main', 'OnBeforeProlog', static function () {
     // Этот js выводит в консоль все custom-event которые срабатывают
     //Asset::getInstance()->addJs('/local/js/find-on-custom-event/find-on-custom-event.js');
+
+    // Подключить slider-helper для открытия определнных страниц сразу в слайдере
+    Extension::load(['otus.sliderHelper',]);
 });
 
 // Пользовательские типы для свойства инфоблока
