@@ -2,6 +2,7 @@
 
 namespace App\IBlock\EventHandlers;
 
+use App\Crm\EventHandlers\DealHandler;
 use App\Debug\Log;
 use App\Models\Lists\OrdersPropertyValuesTable;
 use Bitrix\Main\Loader;
@@ -12,6 +13,12 @@ class OrderHandler
 
     public static function onBeforeElementUpdate(array &$arFields): void
     {
+        // Анти-цикл: если сейчас идёт синхронизация из сделки -> в Orders,
+        // то этот апдейт элемента был инициирован DealHandler-ом. Ничего не делаем.
+        if (defined(DealHandler::LOCK_FLAG) && constant(DealHandler::LOCK_FLAG) === 'Y') {
+            return;
+        }
+
         if ((int)($arFields['IBLOCK_ID'] ?? 0) !== OrdersPropertyValuesTable::getIblockId()) {
             return;
         }
@@ -38,6 +45,12 @@ class OrderHandler
 
     public static function onAfterElementUpdate(array &$arFields): void
     {
+        // Анти-цикл: если апдейт элемента был инициирован DealHandler-ом,
+        // то не обновляем сделку обратно.
+        if (defined(DealHandler::LOCK_FLAG) && constant(DealHandler::LOCK_FLAG) === 'Y') {
+            return;
+        }
+
         if ((int)($arFields['IBLOCK_ID'] ?? 0) !== OrdersPropertyValuesTable::getIblockId()) {
             return;
         }
@@ -95,11 +108,13 @@ class OrderHandler
             return;
         }
 
-        $deal = new \CCrmDeal(false);
+        // Ставим lock на время апдейта сделки, чтобы DealHandler (Deal -> Orders)
+        // не попытался тут же обновить Orders обратно.
+        if (!defined(DealHandler::LOCK_FLAG)) {
+            define(DealHandler::LOCK_FLAG, 'Y');
+        }
 
-        // Важно:
-        // $bCompare = true  — сравнивать и писать в историю (влияет на логи/таймлайн)
-        // $bUpdateSearch = true — обновлять поисковый индекс
+        $deal = new \CCrmDeal(false);
         $result = $deal->Update($dealId, $fields, true, true);
 
         if (!$result) {
