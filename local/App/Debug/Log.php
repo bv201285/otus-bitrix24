@@ -1,51 +1,64 @@
 <?php
 
 namespace App\Debug;
+
 class Log
 {
-
-    /**
-     * Запись сообщения в лог-файл
-     * @param string $message
-     * @param string $fileName
-     * @return bool|int
-     */
-    public static function addLog(string $message, string $fileName='log_custom'): bool | int
+    public static function addLog(mixed $data, string $fileName = 'log_custom'): bool|int
     {
-        $logFile = $_SERVER['DOCUMENT_ROOT'] . '/local/logs/' . $fileName . '.log';
-
-        $message = iconv('utf-8', 'windows-1251', $message);
-
-        $_message = date("d-m-Y H:i:s");
-        $_message .= "\n";
-        $_message .= print_r($message, true);
-        $_message .= "\n";
-        $_message .= "-----------------------------------------";
-        $_message .= "\n";
-
-        if (file_exists($logFile)) {
-            return file_put_contents($logFile, $_message, FILE_APPEND);
+        $dir = $_SERVER['DOCUMENT_ROOT'] . '/local/logs';
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0775, true);
         }
-        else {
-            return false;
+
+        $logFile = $dir . '/' . $fileName . '.log';
+
+        $message = self::stringify($data);
+
+        // Пишем лог ВСЕГДА в UTF-8
+        $message = self::toLogEncoding($message); // -> UTF-8
+
+        $out  = date('d-m-Y H:i:s') . "\n";
+        $out .= $message . "\n";
+        $out .= "-----------------------------------------\n";
+
+        return file_put_contents($logFile, $out, FILE_APPEND);
+    }
+
+    private static function stringify(mixed $data): string
+    {
+        if ($data instanceof \Throwable) {
+            return $data->getMessage() . "\n" . $data->getTraceAsString();
         }
+
+        if (is_string($data)) {
+            return $data;
+        }
+
+        return print_r($data, true);
     }
 
     /**
-     * Очистка произвольного лог-файла
-     * @param string $fileName
-     * @return bool|int
+     * Приводим текст к кодировке лог-файла (в этом примере: UTF-8)
      */
-    public static function clearLogFile(string $fileName='log_custom'): bool | int
+    private static function toLogEncoding(string $s): string
     {
-        $logFile = $_SERVER['DOCUMENT_ROOT'] . '/local/logs/' . $fileName . '.log';
+        // Если Битрикс в UTF — строки уже в UTF-8, не трогаем
+        if (defined('BX_UTF') && BX_UTF) {
+            return $s;
+        }
 
-        if (file_exists($logFile)) {
-            return file_put_contents($logFile, '');
+        // Иначе проект CP1251 -> конвертируем в UTF-8
+        if (function_exists('mb_convert_encoding')) {
+            $converted = @mb_convert_encoding($s, 'UTF-8', 'Windows-1251');
+            return $converted !== false ? $converted : $s;
         }
-        else{
-            return false;
+
+        if (function_exists('iconv')) {
+            $converted = @iconv('Windows-1251', 'UTF-8//IGNORE', $s);
+            return $converted !== false ? $converted : $s;
         }
+
+        return $s;
     }
-
 }
