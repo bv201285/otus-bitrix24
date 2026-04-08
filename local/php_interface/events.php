@@ -1,7 +1,6 @@
 <?php
 
 use Bitrix\Main\Application;
-use Bitrix\Main\Entity\Event;
 use Bitrix\Main\ORM\EventResult;
 use Bitrix\Main\EventManager;
 use Bitrix\Main\Page\Asset;
@@ -17,6 +16,29 @@ $eventManager->addEventHandler('main', 'OnBeforeProlog', static function () {
     // Подключить slider-helper для открытия определнных страниц сразу в слайдере
     Extension::load(['otus.sliderHelper',]);
 });
+
+// OnEpilog
+$eventManager->addEventHandler("main", "OnEpilog", function() {
+
+    // Страница списка компаний
+    if (strpos($_SERVER['REQUEST_URI'], '/crm/company/list/') !== false) {
+        $asset = Asset::getInstance();
+        // Подключаем скрипт специально для фильтра первичный интерес
+        $asset->addCss('/local/assets/css/primary-interest/primary-interest.css');
+        $asset->addJs('/local/js/primary-interest/primary-interest-filter.js');
+    }
+
+});
+
+
+// События IBlock
+$eventManager->AddEventHandler('iblock', 'OnBeforeIBlockElementUpdate',
+    ['App\IBlock\EventHandlers\OrderHandler', 'onBeforeElementUpdate']
+);
+
+$eventManager->AddEventHandler('iblock', 'OnAfterIBlockElementUpdate',
+    ['App\IBlock\EventHandlers\OrderHandler', 'onAfterElementUpdate']
+);
 
 // Пользовательские типы для свойства инфоблока
 $eventManager->AddEventHandler('iblock','OnIBlockPropertyBuildList',

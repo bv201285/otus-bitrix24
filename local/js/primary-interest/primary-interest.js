@@ -82,7 +82,7 @@
             renderRemoteSelect({
                 cont,
                 store,
-                component: 'otus:main.field.primary_interest',
+                component: 'sotra:main.field.primary_interest',
                 action: 'getMarketingActivities',
                 type: 'marketingActivities',
                 placeholder: 'Выберите мероприятие',
@@ -97,7 +97,7 @@
             renderRemoteAutocomplete({
                 cont,
                 store,
-                component: 'otus:main.field.primary_interest',
+                component: 'sotra:main.field.primary_interest',
                 searchAction: 'searchCompanies',
                 titleAction: 'getCompanyTitle',
                 type: 'crmCompany',
@@ -113,7 +113,7 @@
             renderRemoteAutocomplete({
                 cont,
                 store,
-                component: 'otus:main.field.primary_interest',
+                component: 'sotra:main.field.primary_interest',
                 searchAction: 'searchUsers',
                 titleAction: 'getUserFio',
                 type: 'user',
