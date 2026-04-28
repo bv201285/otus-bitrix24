@@ -20,7 +20,7 @@ if ($commentId) {
             CRest::call('crm.contact.update', [
                 'id' => $entityId,
                 'fields' => [
-                    'UF_CRM_LAST_COMM_DATE' => date('d.m.Y H:i:s')
+                    'UF_CRM_LAST_COMM_DATE' => date('Y-m-d')
                 ]
             ]);
         }
