@@ -1,29 +1,46 @@
 <?php
+// Подключаем библиотеку
 require_once(__DIR__ . '/crest.php');
 
-file_put_contents(__DIR__ . '/debug.log', date('Y-m-d H:i:s') . " | REQUEST: " . print_r($_REQUEST, true) . PHP_EOL, FILE_APPEND);
+// 1. Логируем факт прихода запроса (чтобы убедиться, что Битрикс стучится к вам)
+file_put_contents(__DIR__ . '/debug.log', date('Y-m-d H:i:s') . " | Запрос пришел" . PHP_EOL, FILE_APPEND);
 
-$commentId = $_REQUEST['data']['ID'] ?? null;
+// 2. Устанавливаем авторизацию, если она передана (обязательно!)
+/*if (isset($_REQUEST['auth'])) {
+    CRest::setAuth($_REQUEST['auth']);
+}*/
 
-if ($commentId) {
-    $commentInfo = CRest::call('crm.timeline.comment.get', [
-        'id' => $commentId
-    ]);
+// 3. Получаем ID активности из структуры, которую вы прислали
+$activityId = $_REQUEST['data']['FIELDS']['ID'] ?? null;
 
-    if (isset($commentInfo['result'])) {
-        $commentData = $commentInfo['result'];
+if ($activityId) {
+    // 4. Получаем полные данные активности
+    $activityInfo = CRest::call('crm.activity.get', ['id' => $activityId]);
 
-        $entityId = $commentData['ENTITY_ID'];
-        $entityType = $commentData['ENTITY_TYPE'];
+    if (isset($activityInfo['result'])) {
+        $ownerId = $activityInfo['result']['OWNER_ID'];
+        $ownerTypeId = $activityInfo['result']['OWNER_TYPE_ID'];
 
-        if ($entityType === 'contact') {
-            CRest::call('crm.contact.update', [
-                'id' => $entityId,
+        // 5. Проверяем, что это Контакт (ID типа контакта в Битриксе = 3)
+        if ($ownerTypeId == 3) {
+
+            // 6. Обновляем поле
+            $update = CRest::call('crm.contact.update', [
+                'id' => $ownerId,
                 'fields' => [
-                    'UF_CRM_LAST_COMM_DATE' => date('Y-m-d')
+                    'UF_CRM_LAST_COMM_DATE' => date('Y-m-d H:i:s')
                 ]
             ]);
+
+            // Логируем результат обновления
+            file_put_contents(__DIR__ . '/debug.log', "Update status: " . json_encode($update) . PHP_EOL, FILE_APPEND);
+        } else {
+            file_put_contents(__DIR__ . '/debug.log', "Активность не для контакта (тип: $ownerTypeId)" . PHP_EOL, FILE_APPEND);
         }
+    } else {
+        file_put_contents(__DIR__ . '/debug.log', "Ошибка получения активности: " . print_r($activityInfo, true) . PHP_EOL, FILE_APPEND);
     }
+} else {
+    file_put_contents(__DIR__ . '/debug.log', "ID активности не найден в запросе" . PHP_EOL, FILE_APPEND);
 }
 ?>

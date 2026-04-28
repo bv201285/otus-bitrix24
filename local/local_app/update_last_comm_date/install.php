@@ -20,7 +20,7 @@ if($result['rest_only'] === false): ?>
         $handlerUrl = 'https://cz768396.tw1.ru/local/local_app/update_last_comm_date/index.php';
 
         $eventResult = CRest::call('event.bind', [
-            'event' => 'OnCrmTimelineCommentAdd',
+            'event' => 'OnCrmActivityAdd',
             'handler' => $handlerUrl,
         ]);
         ?>
@@ -28,7 +28,7 @@ if($result['rest_only'] === false): ?>
         <h1>Установка завершена</h1>
         <p>
             <?php if(isset($eventResult['result']) && $eventResult['result'] === true): ?>
-                Событие OnCrmTimelineCommentAdd успешно зарегистрировано.
+                Событие OnCrmActivityAdd успешно зарегистрировано.
             <?php else: ?>
                 Ошибка регистрации события: <?php echo $eventResult['error_description'] ?? 'неизвестно'; ?>
             <?php endif; ?>
