@@ -84,5 +84,8 @@
 /vibe/
 /vote-result/
 /gotobot/
+/note/
+/settings/
+/welcome/
 **/node_modules/
 
