@@ -103,22 +103,24 @@ Asset::getInstance()->addCss('//cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bo
                 </h2>
             </li>
             <li>
-                <h2 class="item clock"><a href="/services/lists/">ДЗ #9: Написание своих активити для БП</a>
+                <h2 class="item done"><a href="/services/lists/">ДЗ #9: Написание своих активити для БП</a>
+                    <i class="icon"></i>
+                    <span> --- (10 баллов)</span>
+                </h2>
+            </li>
+            <li>
+                <h2 class="item done"><a href="homework10/">ДЗ #10: Обработка событий </a>
+                    <i class="icon"></i>
+                    <span> --- (10 баллов)</span>
+                </h2>
+            </li>
+            <li>
+                <h2 class="item clock"><a href="homework11/">ДЗ #11: Локальное REST приложение дата последней коммуникации </a>
                     <i class="icon"></i>
                 </h2>
             </li>
             <li>
-                <h2 class="item"><a href="homework10/">ДЗ #10: Обработка событий </a>
-                    <i class="icon"></i>
-                </h2>
-            </li>
-            <li>
-                <h2 class="item"><a href="homework11/">ДЗ #11: Локальное REST приложение дата последней коммуникации </a>
-                    <i class="icon"></i>
-                </h2>
-            </li>
-            <li>
-                <h2 class="item"><a href="homework12/">ДЗ #12: Собственные обработчики REST </a>
+                <h2 class="item clock"><a href="homework12/">ДЗ #12: Собственные обработчики REST </a>
                     <i class="icon"></i>
                 </h2>
             </li>
