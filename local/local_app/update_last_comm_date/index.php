@@ -1,6 +1,8 @@
 <?php
 require_once(__DIR__ . '/crest.php');
 
+file_put_contents(__DIR__ . '/debug.log', date('Y-m-d H:i:s') . " | REQUEST: " . print_r($_REQUEST, true) . PHP_EOL, FILE_APPEND);
+
 $commentId = $_REQUEST['data']['ID'] ?? null;
 
 if ($commentId) {
