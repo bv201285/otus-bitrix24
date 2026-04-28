@@ -5,11 +5,6 @@ require_once(__DIR__ . '/crest.php');
 // 1. Логируем факт прихода запроса (чтобы убедиться, что Битрикс стучится к вам)
 file_put_contents(__DIR__ . '/debug.log', "--- НОВЫЙ ЗАПРОС ---" . PHP_EOL . print_r($_REQUEST, true) . PHP_EOL, FILE_APPEND);
 
-// 2. Устанавливаем авторизацию, если она передана (обязательно!)
-/*if (isset($_REQUEST['auth'])) {
-    CRest::setAuth($_REQUEST['auth']);
-}*/
-
 // 3. Получаем ID активности из структуры, которую вы прислали
 $activityId = $_REQUEST['data']['FIELDS']['ID'] ?? null;
 
