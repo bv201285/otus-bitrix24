@@ -7,12 +7,21 @@ $events = [
     'ONCRMACTIVITYADD',
     'ONCRMACTIVITYUPDATE',
     'ONCRMACTIVITYDELETE',
+    'ONCRMCONTACTADD',
+    'ONCRMCONTACTUPDATE',
+    'ONCRMCONTACTDELETE',
+    'ONCRMDEALADD',
+    'ONCRMDEALUPDATE',
+    'ONCRMDEALDELETE',
+    'ONCRMLEADADD',
+    'ONCRMLEADUPDATE',
+    'ONCRMLEADDELETE',
 ];
 
 echo '<pre>';
 
 foreach ($events as $event) {
-    echo "BIND {$event}:\n";
+    echo "BIND {$event}\n";
     print_r(CRest::call('event.bind', [
         'event' => $event,
         'handler' => $handlerUrl,
@@ -20,7 +29,7 @@ foreach ($events as $event) {
     echo "\n";
 }
 
-echo "EVENT.GET:\n";
+echo "EVENT.GET\n";
 print_r(CRest::call('event.get'));
 
 echo '</pre>';
