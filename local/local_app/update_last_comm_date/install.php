@@ -17,7 +17,7 @@ if($result['rest_only'] === false): ?>
     <body>
     <?php if($result['install'] == true):
 
-        $handlerUrl = 'https://cz768396.tw1.ru/local/local_app/update_last_comm_date/index.php';
+        $handlerUrl = 'https://cz768396.tw1.ru/local/local_app/update_last_comm_date/handler.php';
 
         $eventResult = CRest::call('event.bind', [
             'event' => 'OnCrmActivityAdd',
