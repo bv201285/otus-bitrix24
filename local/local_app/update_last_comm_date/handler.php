@@ -1,7 +1,7 @@
 <?php
 require_once(__DIR__ . '/crest.php');
 
-file_put_contents(__DIR__ . '/debug.log', "--- НОВЫЙ ЗАПРОС ---" . PHP_EOL . print_r($_REQUEST, true) . PHP_EOL, FILE_APPEND);
+file_put_contents(__DIR__ . '/../../logs/debug_local_app.log', "--- НОВЫЙ ЗАПРОС ---" . PHP_EOL . print_r($_REQUEST, true) . PHP_EOL, FILE_APPEND);
 
 $activityId = $_REQUEST['data']['FIELDS']['ID'] ?? null;
 
