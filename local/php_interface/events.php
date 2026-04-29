@@ -31,12 +31,12 @@ $eventManager->addEventHandler("main", "OnEpilog", function() {
 });
 
 // События Сделок
-/*$eventManager->AddEventHandler('crm', 'OnBeforeCrmDealUpdate',
+$eventManager->AddEventHandler('crm', 'OnBeforeCrmDealUpdate',
     ['App\Crm\EventHandlers\DealHandler', 'onBeforeDealUpdate']
 );
 $eventManager->AddEventHandler('crm', 'OnAfterCrmDealUpdate',
     ['App\Crm\EventHandlers\DealHandler', 'onAfterDealUpdate']
-);*/
+);
 
 
 // События IBlock
