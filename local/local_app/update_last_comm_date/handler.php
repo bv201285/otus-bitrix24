@@ -28,14 +28,14 @@ if ($activityId) {
             ]);
 
             // Логируем результат обновления
-            file_put_contents(__DIR__ . '/debug.log', "Update status: " . json_encode($update) . PHP_EOL, FILE_APPEND);
+            file_put_contents(__DIR__ . '/../../logs/debug_local_app.log', "Update status: " . json_encode($update) . PHP_EOL, FILE_APPEND);
         } else {
-            file_put_contents(__DIR__ . '/debug.log', "Активность не для контакта (тип: $ownerTypeId)" . PHP_EOL, FILE_APPEND);
+            file_put_contents(__DIR__ . '/../../logs/debug_local_app.log', "Активность не для контакта (тип: $ownerTypeId)" . PHP_EOL, FILE_APPEND);
         }
     } else {
-        file_put_contents(__DIR__ . '/debug.log', "Ошибка получения активности: " . print_r($activityInfo, true) . PHP_EOL, FILE_APPEND);
+        file_put_contents(__DIR__ . '/../../logs/debug_local_app.log', "Ошибка получения активности: " . print_r($activityInfo, true) . PHP_EOL, FILE_APPEND);
     }
 } else {
-    file_put_contents(__DIR__ . '/debug.log', "ID активности не найден в запросе" . PHP_EOL, FILE_APPEND);
+    file_put_contents(__DIR__ . '/../../logs/debug_local_app.log', "ID активности не найден в запросе" . PHP_EOL, FILE_APPEND);
 }
 ?>
