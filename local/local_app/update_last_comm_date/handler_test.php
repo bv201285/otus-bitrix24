@@ -1,6 +1,6 @@
 <?php
 file_put_contents(
-    __DIR__ . '/debug.log',
+    __DIR__ . '/../../logs/debug_handler_test.log',
     "\n==== " . date('Y-m-d H:i:s') . " ====\n" .
     "EVENT: " . ($_REQUEST['event'] ?? 'NO_EVENT') . "\n" .
     "REQUEST:\n" . print_r($_REQUEST, true) . "\n",
